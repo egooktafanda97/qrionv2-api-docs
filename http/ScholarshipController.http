@@ -1,0 +1,210 @@
+### Scholarship API Testing
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxN2ZlYWI3Ny1jZTgyLTRkMjQtOTI4ZC0xYzEzYjFjZWE4ZDEiLCJpYXQiOjE3NjM5NDU3NzYsImV4cCI6MTc2NDAzMjE3Nn0.t5g0Sb1bHsDf3828DagbjoMpKe0oneU2Em_Id6WwjlY
+
+###
+### SCHOLARSHIP CRUD ENDPOINTS
+###
+
+### 1. List All Scholarships (Paginated - Standard Format)
+GET {{host}}/api/scholarships?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 2. List All Scholarships (jQuery DataTable Format)
+GET {{host}}/api/scholarships?page=0&size=10&sortBy=name&sortDirection=ASC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+Content-Type: {{contentType}}
+
+### 3. List All Scholarships (Ant Design Table Format)
+GET {{host}}/api/scholarships?page=0&size=10&sortBy=startDate&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+Content-Type: {{contentType}}
+
+### 4. Get Scholarship by ID
+GET {{host}}/api/scholarships/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 5. Create New Scholarship - Full Data
+POST {{host}}/api/scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Beasiswa Orangtua ",
+  "description": "Program beasiswa untuk siswa berprestasi dengan nilai rata-rata minimal 85. Mencakup potongan biaya SPP hingga 50% selama 1 tahun ajaran.",
+  "startDate": "2025-07-01",
+  "endDate": "2026-06-30"
+}
+
+### 6. Create New Scholarship - Without End Date
+POST {{host}}/api/scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Beasiswa Prestasi",
+  "description": "Program beasiswa.",
+  "startDate": "2025-01-01",
+  "endDate": null
+}
+
+### 7. Create New Scholarship - Minimal Data
+POST {{host}}/api/scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Beasiswa Hafidz Al-Quran",
+  "startDate": "2025-08-01"
+}
+
+### 8. Update Scholarship
+PUT {{host}}/api/scholarships/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Beasiswa Prestasi Akademik 2025 (Updated)",
+  "description": "Program beasiswa untuk siswa berprestasi dengan nilai rata-rata minimal 90. Mencakup potongan biaya SPP hingga 75% selama 1 tahun ajaran.",
+  "startDate": "2025-07-01",
+  "endDate": "2026-06-30"
+}
+
+### 9. Delete Scholarship (Soft Delete)
+DELETE {{host}}/api/scholarships/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+###
+### ERROR TESTING
+###
+
+### 10. Create Scholarship - Missing Required Field (name)
+POST {{host}}/api/scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "description": "Test beasiswa tanpa nama",
+  "startDate": "2025-07-01"
+}
+
+### 11. Create Scholarship - Missing Required Field (startDate)
+POST {{host}}/api/scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Test Beasiswa",
+  "description": "Test beasiswa tanpa tanggal mulai"
+}
+
+### 12. Create Scholarship - Invalid Date (startDate > endDate)
+POST {{host}}/api/scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Test Beasiswa Invalid Date",
+  "startDate": "2026-12-31",
+  "endDate": "2025-01-01"
+}
+
+### 13. Create Scholarship - Duplicate Name
+POST {{host}}/api/scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Beasiswa Prestasi Akademik 2025",
+  "startDate": "2025-07-01"
+}
+
+### 14. Get Scholarship - Not Found
+GET {{host}}/api/scholarships/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 15. Update Scholarship - Not Found
+PUT {{host}}/api/scholarships/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Test Update Not Found",
+  "startDate": "2025-07-01"
+}
+
+### 16. Delete Scholarship - Not Found
+DELETE {{host}}/api/scholarships/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+###
+### NOTES & DOCUMENTATION
+###
+
+# SCHOLARSHIP API ENDPOINTS
+#
+# Base URL: /api/scholarships
+#
+# Features:
+# 1. List all scholarships dengan pagination (support multiple format)
+# 2. Get scholarship detail by ID
+# 3. Create new scholarship
+# 4. Update existing scholarship
+# 5. Soft delete scholarship
+#
+# Authentication: Bearer Token (Required)
+# Tenancy: Auto filter by yayasan_id & institution_id from logged in user
+#
+# Request Body (Create/Update):
+# {
+#   "name": "string" (required, max 100 chars),
+#   "description": "string" (optional, max 5000 chars),
+#   "startDate": "date" (required, format: YYYY-MM-DD),
+#   "endDate": "date" (optional, format: YYYY-MM-DD)
+# }
+#
+# Response Body:
+# {
+#   "id": "long",
+#   "uuid": "string",
+#   "name": "string",
+#   "description": "string",
+#   "startDate": "date",
+#   "endDate": "date",
+#   "yayasanId": "integer",
+#   "yayasanName": "string",
+#   "institutionId": "integer",
+#   "institutionName": "string",
+#   "createdAt": "datetime",
+#   "updatedAt": "datetime",
+#   "isActive": "boolean",
+#   "status": "string" (ACTIVE | EXPIRED | UPCOMING)
+# }
+#
+# Pagination Formats:
+# 1. Standard: PageResponse with data, total, page, size, totalPages, hasNext, hasPrevious
+# 2. jQuery DataTable: draw, recordsTotal, recordsFiltered, data
+# 3. Ant Design Table: data, success, total, current, pageSize
+#
+# Error Codes:
+# - 1000: INVALID_INPUT - Validasi gagal
+# - 1006: DUPLICATE_ENTRY - Nama beasiswa sudah ada
+# - 2003: PERMISSION_DENIED - Tidak punya akses
+# - 3000: RESOURCE_NOT_FOUND - Beasiswa tidak ditemukan
+#
+# Business Rules:
+# 1. Nama beasiswa harus unik per yayasan & institusi
+# 2. Start date tidak boleh lebih besar dari end date
+# 3. Status beasiswa dihitung otomatis:
+#    - UPCOMING: Hari ini < startDate
+#    - ACTIVE: startDate <= Hari ini <= endDate (atau endDate null)
+#    - EXPIRED: Hari ini > endDate
+# 4. Soft delete: Data tidak benar-benar dihapus, hanya set deletedAt

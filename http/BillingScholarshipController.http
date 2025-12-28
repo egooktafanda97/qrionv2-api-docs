@@ -1,0 +1,315 @@
+### Billing Scholarship API Testing
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxN2ZlYWI3Ny1jZTgyLTRkMjQtOTI4ZC0xYzEzYjFjZWE4ZDEiLCJpYXQiOjE3NjM5NDU3NzYsImV4cCI6MTc2NDAzMjE3Nn0.t5g0Sb1bHsDf3828DagbjoMpKe0oneU2Em_Id6WwjlY
+
+###
+### BILLING SCHOLARSHIP CRUD ENDPOINTS
+###
+
+### 1. List All Billing Scholarships (Paginated - Standard Format)
+GET {{host}}/api/billing-scholarships?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 2. List All Billing Scholarships (jQuery DataTable Format)
+GET {{host}}/api/billing-scholarships?page=0&size=10&sortBy=amount&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+Content-Type: {{contentType}}
+
+### 3. List All Billing Scholarships (Ant Design Table Format)
+GET {{host}}/api/billing-scholarships?page=0&size=10&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+Content-Type: {{contentType}}
+
+### 4. Get Billing Scholarship by ID
+GET {{host}}/api/billing-scholarships/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 5. Get All Scholarships Applied to a Billing
+GET {{host}}/api/billing-scholarships/billing/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 6. Get All Billings Using a Scholarship
+GET {{host}}/api/billing-scholarships/scholarship/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 7. Apply Scholarship to Billing - Full Data (Percentage Discount)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 3,
+  "discountType": "PERCENTAGE",
+  "discountValue": 50.00,
+  "maxDiscountAmount": 500000.00,
+  "months": [1, 2, 3],
+  "notes": "Potongan 50% untuk siswa berprestasi. Potongan ini berlaku untuk SPP bulan Juli 2025."
+}
+
+### 8. Apply Scholarship to Billing - Minimal Data (Fixed Amount)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 3,
+  "discountType": "FIXED",
+  "discountValue": 250000.00,
+  "months": [1, 2, 3]
+}
+
+### 9. Apply Scholarship to Billing - Full Scholarship (100% Discount)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 1,
+  "discountType": "PERCENTAGE",
+  "discountValue": 100.00,
+  "months": [1, 2, 3, 4, 5, 6],
+  "notes": "Beasiswa penuh untuk siswa yatim piatu"
+}
+
+### 10. Update Billing Scholarship Discount
+PUT {{host}}/api/billing-scholarships/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 1,
+  "discountType": "PERCENTAGE",
+  "discountValue": 75.00,
+  "maxDiscountAmount": 1000000.00,
+  "months": [1, 2, 3, 4, 5, 6],
+  "notes": "Update potongan menjadi 75% setelah verifikasi prestasi tambahan"
+}
+
+### 11. Remove Scholarship from Billing (Soft Delete)
+DELETE {{host}}/api/billing-scholarships/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+###
+### ERROR TESTING
+###
+
+### 12. Apply Scholarship - Missing Required Field (scholarshipId)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "mBillingId": 1,
+  "discountType": "FIXED",
+  "discountValue": 500000.00,
+  "months": [1]
+}
+
+### 13. Apply Scholarship - Missing Required Field (mBillingId)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "discountType": "FIXED",
+  "discountValue": 500000.00,
+  "months": [1]
+}
+
+### 14. Apply Scholarship - Missing Required Field (discountType)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 1,
+  "discountValue": 500000.00,
+  "months": [1]
+}
+
+### 15. Apply Scholarship - Invalid Discount Value (negative)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 1,
+  "discountType": "FIXED",
+  "discountValue": -100000.00,
+  "months": [1]
+}
+
+### 16. Apply Scholarship - Invalid Discount Value (zero)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 1,
+  "discountType": "FIXED",
+  "discountValue": 0.00,
+  "months": [1]
+}
+
+### 17. Apply Scholarship - Invalid Percentage (>100%)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 1,
+  "discountType": "PERCENTAGE",
+  "discountValue": 150.00,
+  "months": [1],
+  "notes": "Trying to apply discount larger than 100%"
+}
+
+### 18. Apply Scholarship - Duplicate (Same Scholarship on Same Billing)
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 1,
+  "discountType": "FIXED",
+  "discountValue": 500000.00,
+  "months": [1],
+  "notes": "Trying to apply same scholarship twice"
+}
+
+### 19. Apply Scholarship - Multiple Scholarships on Same Billing
+# Apply second scholarship to same billing
+POST {{host}}/api/billing-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 2,
+  "mBillingId": 1,
+  "discountType": "PERCENTAGE",
+  "discountValue": 25.00,
+  "months": [4, 5, 6],
+  "notes": "Additional 25% discount for months 4-6"
+}
+
+### 20. Get Billing Scholarship - Not Found
+GET {{host}}/api/billing-scholarships/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 21. Update Billing Scholarship - Not Found
+PUT {{host}}/api/billing-scholarships/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "scholarshipId": 1,
+  "mBillingId": 1,
+  "discountType": "FIXED",
+  "discountValue": 500000.00,
+  "months": [1]
+}
+
+### 22. Delete Billing Scholarship - Not Found
+DELETE {{host}}/api/billing-scholarships/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 23. Get Scholarships for Non-existent Billing
+GET {{host}}/api/billing-scholarships/billing/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 24. Get Billings for Non-existent Scholarship
+GET {{host}}/api/billing-scholarships/scholarship/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+###
+### NOTES & DOCUMENTATION
+###
+
+# BILLING SCHOLARSHIP API ENDPOINTS
+#
+# Base URL: /api/billing-scholarships
+#
+# Features:
+# 1. Apply scholarship discount to master billing (with amount validation)
+# 2. List all billing scholarships dengan pagination (support multiple format)
+# 3. Get billing scholarships by master billing ID (see all discounts on a master billing)
+# 4. Get billing scholarships by scholarship ID (see all master billings using a scholarship)
+# 5. Update scholarship discount amount
+# 6. Remove scholarship from master billing (soft delete)
+#
+# Authentication: Bearer Token (Required)
+# Tenancy: Auto filter by yayasan_id & institution_id from logged in user
+#
+# Request Body (Create/Update):
+# {
+#   "scholarshipId": "long" (required),
+#   "mBillingId": "long" (required),
+#   "discountType": "string" (required, values: "PERCENTAGE" or "FIXED"),
+#   "discountValue": "decimal" (required, min: 0.01, max 15 digits),
+#   "maxDiscountAmount": "decimal" (optional, for PERCENTAGE type),
+#   "months": "integer[]" (required, values: 1-12),
+#   "notes": "string" (optional, max 2000 chars)
+# }
+#
+# Response Body:
+# {
+#   "id": "long",
+#   "uuid": "string",
+#   "scholarshipId": "long",
+#   "scholarshipName": "string",
+#   "mBillingId": "long",
+#   "mBillingName": "string",
+#   "billingType": "string",
+#   "discountType": "string",
+#   "discountValue": "decimal",
+#   "maxDiscountAmount": "decimal",
+#   "months": "integer[]",
+#   "notes": "string",
+#   "createdAt": "datetime",
+#   "updatedAt": "datetime"
+# }
+#
+# Business Rules:
+# 1. Discount type: PERCENTAGE (dengan max amount) atau FIXED (nominal tetap)
+# 2. Untuk PERCENTAGE: discountValue = persentase (0-100), maxDiscountAmount = batas maksimal potongan
+# 3. Untuk FIXED: discountValue = nominal potongan tetap
+# 4. Months array menentukan bulan mana saja scholarship berlaku (1=Jan, 12=Dec)
+# 5. Satu scholarship bisa diterapkan pada master billing yang sama untuk bulan berbeda
+# 6. Scholarship dan master billing harus dalam yayasan & institusi yang sama
+# 7. Soft delete: Data tidak benar-benar dihapus, hanya set deletedAt
+#
+# Error Codes:
+# - 1000: INVALID_INPUT - Validasi gagal
+# - 1006: DUPLICATE_ENTRY - Scholarship sudah diterapkan pada master billing ini
+# - 2003: PERMISSION_DENIED - Tidak punya akses
+# - 3000: RESOURCE_NOT_FOUND - Resource tidak ditemukan
+# - 4000: BUSINESS_RULE_VIOLATION - Melanggar aturan bisnis (amount melebihi master billing)
+#
+# Use Cases:
+# 1. Memberikan potongan beasiswa pada master billing dengan persentase atau nominal tetap
+# 2. Menerapkan scholarship untuk bulan-bulan tertentu (misal: Jan-Jun dapat 50%, Jul-Dec dapat 25%)
+# 3. Batasi maksimal potongan untuk PERCENTAGE (misal: 50% tapi max 500rb)
+# 4. Tracking discount yang diberikan per master billing per bulan
+# 5. Menerapkan multiple scholarships pada 1 master billing untuk periode berbeda

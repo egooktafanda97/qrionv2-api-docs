@@ -1,0 +1,56 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxN2ZlYWI3Ny1jZTgyLTRkMjQtOTI4ZC0xYzEzYjFjZWE4ZDEiLCJpYXQiOjE3NjM5NDU3NzYsImV4cCI6MTc2NDAzMjE3Nn0.t5g0Sb1bHsDf3828DagbjoMpKe0oneU2Em_Id6WwjlY
+
+### List subscription plans
+GET {{host}}/api/subscription-plans
+Authorization: Bearer {{token}}
+
+### Get subscription plan by id
+GET {{host}}/api/subscription-plans/1
+Authorization: Bearer {{token}}
+
+### Create subscription plan (valid)
+POST {{host}}/api/subscription-plans
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Basic Plan",
+  "category": "STUDENT",
+  "periodMonth": 12,
+  "price": 100.0,
+  "kuota": 50,
+  "discount": 10.5
+}
+
+### Create subscription plan (invalid - missing name)
+POST {{host}}/api/subscription-plans
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "category": "STUDENT",
+  "periodMonth": 6,
+  "price": 50.0,
+  "kuota": 25,
+  "discount": 5.0
+}
+
+### Update subscription plan
+PUT {{host}}/api/subscription-plans/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Basic Plan - Updated",
+  "category": "STUDENT",
+  "periodMonth": 12,
+  "price": 120.0,
+  "kuota": 75,
+  "discount": 15.0
+}
+
+### Delete subscription plan
+DELETE {{host}}/api/subscription-plans/1
+Authorization: Bearer {{token}}

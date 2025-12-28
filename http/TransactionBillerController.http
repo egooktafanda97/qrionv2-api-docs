@@ -1,0 +1,291 @@
+### Transaction Biller API - HTTP collection for VS Code REST Client
+@baseUrl = http://localhost:8081
+@token = YOUR_JWT_TOKEN_HERE
+
+### ======================================
+### BASIC CRUD ENDPOINTS
+### ======================================
+
+### Create Transaction Biller
+# Note: invoiceNumber, invoiceBusiness, and userPaymentId are auto-generated/taken from auth
+POST {{baseUrl}}/api/transaction-biller
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userBilledId": 2,
+  "amount": 500000,
+  "channel": "ONLINE",
+  "providerFee": 2500,
+  "adminFee": 5000,
+  "billType": "BANK_TRANSFER",
+  "paymentType": "BANK_TRANSFER",
+  "description": "Payment for tuition fee"
+}
+
+###
+
+### Get Transaction Biller by ID
+GET {{baseUrl}}/api/transaction-biller/1
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Transaction Billers (Non-paginated)
+GET {{baseUrl}}/api/transaction-biller
+Authorization: Bearer {{token}}
+
+###
+
+### Update Transaction Biller
+# Note: invoiceNumber, invoiceBusiness, and userPaymentId are auto-generated/taken from auth
+PUT {{baseUrl}}/api/transaction-biller/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userBilledId": 2,
+  "amount": 550000,
+  "channel": "ONLINE",
+  "providerFee": 2500,
+  "adminFee": 5000,
+  "billType": "BANK_TRANSFER",
+  "paymentType": "BANK_TRANSFER",
+  "description": "Updated payment for tuition fee"
+}
+
+###
+
+### Delete Transaction Biller
+DELETE {{baseUrl}}/api/transaction-biller/1
+Authorization: Bearer {{token}}
+
+###
+
+### ======================================
+### PAGINATED LIST ENDPOINTS
+### ======================================
+
+### Get All Transaction Billers (Paginated)
+# Returns all transaction billers for current user's yayasan and institution
+GET {{baseUrl}}/api/transaction-biller/list/all?page=0&size=20&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Transaction Billers (Paginated - First Page)
+GET {{baseUrl}}/api/transaction-biller/list/all?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Transaction Billers (Paginated - Second Page)
+GET {{baseUrl}}/api/transaction-biller/list/all?page=1&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Transaction Billers (Sorted by Amount Ascending)
+GET {{baseUrl}}/api/transaction-biller/list/all?page=0&size=20&sortBy=amount&sortDirection=ASC
+Authorization: Bearer {{token}}
+
+###
+
+### Get Transaction Billers by User ID (Paginated)
+# Returns all transaction billers for specific user
+GET {{baseUrl}}/api/transaction-biller/list/user/2?page=0&size=20&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### Get Transaction Billers by User ID (Paginated - Large Page Size)
+GET {{baseUrl}}/api/transaction-biller/list/user/2?page=0&size=100
+Authorization: Bearer {{token}}
+
+###
+
+### Get Transaction Billers by Billing ID (Paginated)
+# Returns all transaction billers for specific billing
+GET {{baseUrl}}/api/transaction-biller/list/billing/1?page=0&size=20&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### Get Transaction Billers by Billing ID (Paginated - Filter by Date)
+GET {{baseUrl}}/api/transaction-biller/list/billing/1?page=0&size=50&sortBy=createdAt&sortDirection=ASC
+Authorization: Bearer {{token}}
+
+###
+
+### ======================================
+### PAYMENT CASH ENDPOINTS
+### ======================================
+
+### Payment Cash - Full Payment
+POST {{baseUrl}}/api/transaction-biller/payment-cash
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userBillingId": 1,
+  "totalPayment": 1000000,
+  "pin": "123456"
+}
+
+###
+
+### Payment Cash - Partial Payment
+POST {{baseUrl}}/api/transaction-biller/payment-cash
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userBillingId": 2,
+  "totalPayment": 500000,
+  "pin": "123456"
+}
+
+###
+
+### Payment Cash - Example with actual values
+# Adjust userBillingId and totalPayment based on your data
+POST {{baseUrl}}/api/transaction-biller/payment-cash
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userBillingId": 10,
+  "totalPayment": 2500000.00,
+  "pin": "123456"
+}
+
+###
+
+### ======================================
+### PAYMENT GATEWAY ENDPOINTS
+### ======================================
+
+### Payment Gateway - Create Payment Request
+# Returns payment gateway URL and transaction details
+POST {{baseUrl}}/api/transaction-biller/payment-gateway
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userBillingId": 1,
+  "totalPayment": 1000000,
+  "paymentMethod": "va",
+  "paymentChannel": "bni"
+}
+
+###
+
+### Payment Gateway - Example with different channel
+POST {{baseUrl}}/api/transaction-biller/payment-gateway
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userBillingId": 2,
+  "totalPayment": 500000,
+  "paymentMethod": "va",
+  "paymentChannel": "bca"
+}
+
+###
+
+### Payment Gateway - QRIS Payment
+POST {{baseUrl}}/api/transaction-biller/payment-gateway
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userBillingId": 3,
+  "totalPayment": 250000,
+  "paymentMethod": "qris",
+  "paymentChannel": "linkaja"
+}
+
+###
+
+### ======================================
+### NOTES AND DOCUMENTATION
+### ======================================
+
+# Transaction Biller API Documentation
+#
+# Available Endpoints:
+# 1. POST /api/transaction-biller - Create transaction biller
+# 2. GET /api/transaction-biller/{id} - Get by ID
+# 3. GET /api/transaction-biller - Get all (non-paginated)
+# 4. PUT /api/transaction-biller/{id} - Update transaction biller
+# 5. DELETE /api/transaction-biller/{id} - Delete transaction biller
+# 6. POST /api/transaction-biller/payment-cash - Process cash payment
+# 7. POST /api/transaction-biller/payment-gateway - Create payment gateway request
+# 8. GET /api/transaction-biller/list/all - Get all paginated
+# 9. GET /api/transaction-biller/list/user/{userId} - Get by user ID paginated
+# 10. GET /api/transaction-biller/list/billing/{billingId} - Get by billing ID paginated
+#
+# Pagination Parameters (for list endpoints):
+# - page (default: 0) - Page number, 0-indexed
+# - size (default: 10) - Number of items per page
+# - sortBy (default: "createdAt") - Field to sort by
+# - sortDirection (default: "DESC") - ASC or DESC
+#
+# Response Format (for paginated endpoints):
+# {
+#   "data": [...],
+#   "total": 100,
+#   "page": 0,
+#   "size": 20,
+#   "totalPages": 5,
+#   "hasNext": true,
+#   "hasPrevious": false
+# }
+#
+# Payment Cash Request:
+# - userBillingId: ID of user billing to pay
+# - totalPayment: Amount to pay (can be partial or full)
+# - pin: User's PIN for verification
+#
+# Payment Gateway Request:
+# - userBillingId: ID of user billing to pay
+# - totalPayment: Amount to pay
+# - paymentMethod: Payment method (va, qris, etc.)
+# - paymentChannel: Payment channel (bni, bca, mandiri, linkaja, etc.)
+#
+# Payment Gateway Response:
+# Returns PaymentGatewayLogResponse containing:
+# - Payment URL for user to complete payment
+# - Transaction ID
+# - Virtual Account number (if applicable)
+# - QR Code (if applicable)
+# - Expiry time
+#
+# Channel Types:
+# - ONLINE - Online payment
+# - OFFLINE - Cash payment
+#
+# Bill Types:
+# - BANK_TRANSFER
+# - CASH
+# - VIRTUAL_ACCOUNT
+# - QRIS
+# - E_WALLET
+#
+# Payment Types:
+# - BANK_TRANSFER
+# - CASH
+# - VIRTUAL_ACCOUNT
+# - QRIS
+# - OVO
+# - GOPAY
+# - DANA
+# - LINKAJA
+#
+# Notes:
+# - invoiceNumber is auto-generated
+# - invoiceBusiness is auto-generated
+# - userPaymentId is taken from authenticated user
+# - All amounts are in IDR (Indonesian Rupiah)
+# - Timestamps use ISO-8601 format

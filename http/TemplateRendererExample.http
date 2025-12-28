@@ -1,0 +1,184 @@
+### Template Renderer Test Examples
+### This file demonstrates how to use the TemplateRenderer.buildMessage() method
+### to replace template placeholders with actual values
+
+# Example 1: Billing notification message template
+@billngTemplate = "Yth. Orang Tua/Wali dari [nama_siswa],\n\nKami informasikan bahwa tagihan [jenis_tagihan] untuk bulan [bulan_penagihan] telah tersedia.\n\nDetail Tagihan:\n- Nama Siswa: [nama_siswa]\n- Kelas: [siswa_kelas]\n- Nominal: Rp [nominal_tagihan]\n- Jatuh Tempo: [tanggal_tempo]\n\nMohon segera melakukan pembayaran sebelum tanggal jatuh tempo.\n\nTerima kasih,\n[nama_institut]"
+
+# Example 2: Payment reminder template
+@reminderTemplate = "Reminder Pembayaran!\n\nHalo [nama_wali],\n\nTagihan untuk [nama_siswa] kelas [siswa_kelas] sebesar Rp [nominal_tagihan] akan jatuh tempo pada [tanggal_tempo].\n\nSilakan hubungi [nama_institut] untuk info lebih lanjut."
+
+# Example 3: Payment confirmation template
+@confirmationTemplate = "Terima kasih [nama_wali]!\n\nPembayaran untuk [nama_siswa] ([siswa_kelas]) sebesar Rp [nominal_tagihan] telah kami terima pada tanggal [tanggal_penagihan].\n\nTagihan bulan [bulan_penagihan] telah lunas.\n\n[nama_institut]"
+
+### Java Code Example for Using buildMessage() Method:
+
+/**
+ * Example: Building a billing notification message
+ */
+public String createBillingNotification(UserBilling userBilling, Students student, 
+                                       SchoolClass schoolClass, Institution institution) {
+    
+    // 1. Prepare the template message (from database or config)
+    String template = "Yth. [nama_wali],\n\n" +
+                      "Tagihan [jenis_tagihan] untuk [nama_siswa] kelas [siswa_kelas] " +
+                      "sebesar Rp [nominal_tagihan] telah dibuat.\n\n" +
+                      "Mohon dibayarkan sebelum [tanggal_tempo].\n\n" +
+                      "Terima kasih,\n[nama_institut]";
+    
+    // 2. Build TemplateReplaceItem with actual data
+    TemplateReplaceItem item = TemplateReplaceItem.builder()
+        .namaSiswa(student.getName())
+        .alamatSiswa(student.getFullAddress())
+        .namaInstitut(institution.getName())
+        .siswaKelas(schoolClass.getName())
+        .nominalTagihan(TemplateReplaceItem.formatCurrency(userBilling.getNetAmount()))
+        .tanggalTempo(TemplateReplaceItem.formatDate(userBilling.getBilling().getBillingDueDate()))
+        .namaWali(student.getParentName())
+        .bulanPenagihan(TemplateReplaceItem.getIndonesianMonth(userBilling.getMonthIndex()))
+        .jenisTagihan(userBilling.getBilling().getMBilling().getName())
+        .tanggalPenagihan(TemplateReplaceItem.formatDate(LocalDate.now()))
+        .build();
+    
+    // 3. Use TemplateRenderer to replace placeholders
+    String message = templateRenderer.buildMessage(template, item);
+    
+    return message;
+}
+
+### Expected Output Example:
+
+/**
+ * Input Template:
+ * "Yth. [nama_wali],
+ * 
+ * Tagihan [jenis_tagihan] untuk [nama_siswa] kelas [siswa_kelas] 
+ * sebesar Rp [nominal_tagihan] telah dibuat.
+ * 
+ * Mohon dibayarkan sebelum [tanggal_tempo].
+ * 
+ * Terima kasih,
+ * [nama_institut]"
+ * 
+ * Output Message:
+ * "Yth. Budi Santoso,
+ * 
+ * Tagihan SPP untuk Ahmad Fauzi kelas 7A 
+ * sebesar Rp 500,000 telah dibuat.
+ * 
+ * Mohon dibayarkan sebelum 10 Januari 2025.
+ * 
+ * Terima kasih,
+ * SMP Negeri 1 Jakarta"
+ */
+
+### Unit Test Example:
+
+@Test
+public void testBuildMessage_withAllFields() {
+    // Arrange
+    String template = "Siswa: [nama_siswa], Kelas: [siswa_kelas], " +
+                     "Tagihan: Rp [nominal_tagihan], Tempo: [tanggal_tempo]";
+    
+    TemplateReplaceItem item = TemplateReplaceItem.builder()
+        .namaSiswa("Ahmad Fauzi")
+        .siswaKelas("7A")
+        .nominalTagihan("500,000")
+        .tanggalTempo("10 Januari 2025")
+        .build();
+    
+    // Act
+    String result = templateRenderer.buildMessage(template, item);
+    
+    // Assert
+    String expected = "Siswa: Ahmad Fauzi, Kelas: 7A, " +
+                     "Tagihan: Rp 500,000, Tempo: 10 Januari 2025";
+    assertEquals(expected, result);
+}
+
+@Test
+public void testBuildMessage_withMissingFields() {
+    // Arrange - some fields are null
+    String template = "Siswa: [nama_siswa], Alamat: [alamat_siswa]";
+    
+    TemplateReplaceItem item = TemplateReplaceItem.builder()
+        .namaSiswa("Ahmad Fauzi")
+        // alamatSiswa is null
+        .build();
+    
+    // Act
+    String result = templateRenderer.buildMessage(template, item);
+    
+    // Assert - missing field should be replaced with empty string
+    String expected = "Siswa: Ahmad Fauzi, Alamat: ";
+    assertEquals(expected, result);
+}
+
+@Test
+public void testFormatCurrency() {
+    // Test currency formatting
+    BigDecimal amount = new BigDecimal("1500000.50");
+    String formatted = TemplateReplaceItem.formatCurrency(amount);
+    assertEquals("1,500,001", formatted); // Rounds to nearest integer
+}
+
+@Test
+public void testFormatDate() {
+    // Test date formatting
+    LocalDate date = LocalDate.of(2025, 1, 10);
+    String formatted = TemplateReplaceItem.formatDate(date);
+    assertEquals("10 Januari 2025", formatted);
+}
+
+@Test
+public void testGetIndonesianMonth() {
+    assertEquals("Januari", TemplateReplaceItem.getIndonesianMonth(1));
+    assertEquals("Desember", TemplateReplaceItem.getIndonesianMonth(12));
+    assertEquals("", TemplateReplaceItem.getIndonesianMonth(13)); // Invalid month
+}
+
+### Integration with Broadcast Service Example:
+
+@Service
+public class BroadcastService {
+    
+    @Autowired
+    private TemplateRenderer templateRenderer;
+    
+    @Autowired
+    private BroadcastTemplateRepository templateRepository;
+    
+    public void sendBillingNotification(UserBilling userBilling) {
+        // 1. Get template from database
+        BroadcastTemplate template = templateRepository
+            .findByCategory("BILLING_NOTIFICATION")
+            .orElseThrow();
+        
+        // 2. Fetch related data
+        Students student = userBilling.getBilledUser().getStudent();
+        SchoolClass schoolClass = getCurrentClass(student);
+        Institution institution = userBilling.getInstitution();
+        
+        // 3. Build replacement item
+        TemplateReplaceItem item = TemplateReplaceItem.builder()
+            .namaSiswa(student.getName())
+            .alamatSiswa(student.getFullAddress())
+            .namaInstitut(institution.getName())
+            .siswaKelas(schoolClass.getName())
+            .nominalTagihan(TemplateReplaceItem.formatCurrency(userBilling.getNetAmount()))
+            .tanggalTempo(TemplateReplaceItem.formatDate(
+                userBilling.getBilling().getBillingDueDate()))
+            .namaWali(student.getParentName())
+            .bulanPenagihan(TemplateReplaceItem.getIndonesianMonth(
+                userBilling.getMonthIndex()))
+            .jenisTagihan(userBilling.getBilling().getName())
+            .tanggalPenagihan(TemplateReplaceItem.formatDate(LocalDate.now()))
+            .build();
+        
+        // 4. Build final message
+        String message = templateRenderer.buildMessage(template.getContent(), item);
+        
+        // 5. Send notification (SMS/Email/WhatsApp)
+        sendNotification(student.getParentPhone(), message);
+    }
+}

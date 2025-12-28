@@ -1,0 +1,206 @@
+### Teacher API Testing
+
+### Variables
+@baseUrl = http://localhost:8081/api/teachers
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+@teacherId = 1
+
+### ===========================================
+### 1. CREATE TEACHER - Create new teacher with auto user & wallet
+POST {{baseUrl}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "guru.budi",
+  "telephone": "081234567890",
+  "email": "budi.teacher@example.com",
+  "nip": "198501012010011001",
+  "name": "Budi Santoso",
+  "gender": "M",
+  "placeOfBirth": "Jakarta",
+  "dateOfBirth": "1985-01-01",
+  "religion": "ISLAM",
+  "province": "DKI Jakarta",
+  "city": "Jakarta Pusat",
+  "district": "Menteng",
+  "fullAddress": "Jl. Menteng Raya No. 10",
+  "phone": "081234567890",
+  "positionId": 1,
+  "isTeacher": true
+}
+
+### ===========================================
+### 2. GET ALL TEACHERS - List all teachers
+GET {{baseUrl}}
+Authorization: Bearer {{token}}
+
+### ===========================================
+### 3. GET TEACHER BY ID - Get specific teacher details
+GET {{baseUrl}}/{{teacherId}}
+Authorization: Bearer {{token}}
+
+### ===========================================
+### 4. UPDATE TEACHER - Update teacher information
+PUT {{baseUrl}}/{{teacherId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "budi.updated@example.com",
+  "telephone": "081234567899",
+  "nip": "198501012010011002",
+  "name": "Budi Santoso S.Pd",
+  "gender": "M",
+  "placeOfBirth": "Jakarta Timur",
+  "dateOfBirth": "1985-01-01",
+  "religion": "ISLAM",
+  "province": "DKI Jakarta",
+  "city": "Jakarta Timur",
+  "district": "Jatinegara",
+  "fullAddress": "Jl. Jatinegara Barat No. 25",
+  "phone": "081234567899",
+  "positionId": 2,
+  "isTeacher": true
+}
+
+### ===========================================
+### 5. DELETE TEACHER - Soft delete teacher
+DELETE {{baseUrl}}/{{teacherId}}
+Authorization: Bearer {{token}}
+
+### ===========================================
+### ERROR CASES
+### ===========================================
+
+### 6. CREATE TEACHER - Missing required fields
+POST {{baseUrl}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "",
+  "telephone": "",
+  "name": ""
+}
+
+### ===========================================
+### 7. CREATE TEACHER - Invalid email format
+POST {{baseUrl}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "guru.invalid",
+  "telephone": "081234567890",
+  "email": "invalid-email",
+  "name": "Invalid Teacher",
+  "isTeacher": true
+}
+
+### ===========================================
+### 8. CREATE TEACHER - Duplicate telephone/username
+POST {{baseUrl}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "guru.budi",
+  "telephone": "081234567890",
+  "email": "duplicate@example.com",
+  "name": "Duplicate Teacher",
+  "isTeacher": true
+}
+
+### ===========================================
+### 9. GET TEACHER - Teacher not found
+GET {{baseUrl}}/99999
+Authorization: Bearer {{token}}
+
+### ===========================================
+### 10. UPDATE TEACHER - Teacher not found
+PUT {{baseUrl}}/99999
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Non Existent Teacher"
+}
+
+### ===========================================
+### 11. DELETE TEACHER - Teacher not found
+DELETE {{baseUrl}}/99999
+Authorization: Bearer {{token}}
+
+### ===========================================
+### 12. CREATE TEACHER - Unauthorized (no token)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "username": "unauthorized",
+  "telephone": "081234567890",
+  "email": "unauthorized@example.com",
+  "name": "Unauthorized Teacher",
+  "isTeacher": true
+}
+
+### ===========================================
+### COMPLETE FLOW TEST
+### ===========================================
+
+### FLOW 1: Complete teacher CRUD flow
+### Step 1: Create teacher
+POST {{baseUrl}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "test.teacher",
+  "telephone": "081999888777",
+  "email": "test.teacher@example.com",
+  "nip": "199001012015011001",
+  "name": "Test Teacher",
+  "gender": "F",
+  "placeOfBirth": "Bandung",
+  "dateOfBirth": "1990-01-01",
+  "religion": "ISLAM",
+  "province": "Jawa Barat",
+  "city": "Bandung",
+  "district": "Cicendo",
+  "fullAddress": "Jl. Cicendo No. 100",
+  "phone": "081999888777",
+  "positionId": 1,
+  "isTeacher": true
+}
+
+### Step 2: Get all teachers (verify creation)
+GET {{baseUrl}}
+Authorization: Bearer {{token}}
+
+### Step 3: Get specific teacher by ID (use ID from step 1 response)
+GET {{baseUrl}}/1
+Authorization: Bearer {{token}}
+
+### Step 4: Update teacher information
+PUT {{baseUrl}}/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Test Teacher Updated",
+  "phone": "081999888778",
+  "fullAddress": "Jl. Cicendo No. 101"
+}
+
+### Step 5: Get updated teacher details
+GET {{baseUrl}}/1
+Authorization: Bearer {{token}}
+
+### Step 6: Delete teacher
+DELETE {{baseUrl}}/1
+Authorization: Bearer {{token}}
+
+### Step 7: Verify deletion (should return 404 or empty list)
+GET {{baseUrl}}/1
+Authorization: Bearer {{token}}

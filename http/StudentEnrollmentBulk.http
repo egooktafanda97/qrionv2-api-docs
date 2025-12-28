@@ -1,0 +1,252 @@
+### Student Enrollment Bulk Insert and Filtered Queries HTTP Tests
+
+@baseUrl = http://localhost:8081
+@token = {{your_jwt_token_here}}
+
+### 1. Bulk Insert Student Enrollments (Valid - Same Institution)
+# Note: enrolledAt is auto-set to LocalDateTime.now(); classId required, subClassId optional
+# Security: All resources (students, academicYear, class/subClass) must belong to the authenticated user's institution
+POST {{baseUrl}}/api/student-enrollments/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [1, 2, 3, 4],
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 1
+}
+
+### 1.1 TEST: Bulk Insert with Invalid SubClass (Different Institution) - Should Return 403
+# Expected Error: "Anda tidak memiliki akses ke sub kelas ini karena berbeda institusi"
+POST {{baseUrl}}/api/student-enrollments/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [1, 2],
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 999
+}
+
+### 1.2 TEST: Bulk Insert with Invalid Academic Year (Different Institution) - Should Return 403
+# Expected Error: "Anda tidak memiliki akses ke tahun ajaran ini"
+POST {{baseUrl}}/api/student-enrollments/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [1, 2],
+  "academicYearId": 999,
+  "classId": 1,
+  "subClassId": 1
+}
+
+### 1.3 TEST: Bulk Insert with Invalid Students (Different Yayasan/Institution) - Should Skip
+# Students not belonging to user's institution will be skipped during processing
+POST {{baseUrl}}/api/student-enrollments/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [1, 2, 999, 998],
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 1
+}
+
+### 1.4 Bulk Assign Students from Class to SubClass (New Endpoint)
+# Requires students already enrolled in the specified classId; subClassId is the target subclass
+POST {{baseUrl}}/api/student-enrollments/bulk-assign-subclass
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [1, 2, 3],
+  "classId": 1,
+  "academicYearId": 1,
+  "subClassId": 2,
+  "transferStatus": "MASUK",
+  "createIfMissing": true,
+  "note": "Pindah ke sub kelas B"
+}
+
+### 2. Get Enrollments by Academic Year (Standard Format)
+GET {{baseUrl}}/api/student-enrollments/by-academic-year/1?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: standard
+
+### 3. Get Enrollments by Academic Year (jQuery DataTable Format)
+GET {{baseUrl}}/api/student-enrollments/by-academic-year/1?page=0&size=10&sortBy=id&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+### 4. Get Enrollments by Academic Year (Ant Design Table Format)
+GET {{baseUrl}}/api/student-enrollments/by-academic-year/1?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+### 5. Get Enrollments by Active Semester (Standard Format)
+GET {{baseUrl}}/api/student-enrollments/by-active-semester?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: standard
+
+### 6. Get Enrollments by Active Semester (jQuery DataTable Format)
+GET {{baseUrl}}/api/student-enrollments/by-active-semester?page=0&size=10&sortBy=id&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+### 7. Get Enrollments by Active Semester (Ant Design Table Format)
+GET {{baseUrl}}/api/student-enrollments/by-active-semester?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+### 8. Get Enrollments by Class ID (Standard Format)
+GET {{baseUrl}}/api/student-enrollments/by-class/1?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: standard
+
+### 9. Get Enrollments by Class ID (jQuery DataTable Format)
+GET {{baseUrl}}/api/student-enrollments/by-class/1?page=0&size=10&sortBy=id&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+### 10. Get Enrollments by Class ID (Ant Design Table Format)
+GET {{baseUrl}}/api/student-enrollments/by-class/1?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+### 11. Get Enrollments by SubClass ID (Standard Format)
+GET {{baseUrl}}/api/student-enrollments/by-subclass/1?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: standard
+
+### 12. Get Enrollments by SubClass ID (jQuery DataTable Format)
+GET {{baseUrl}}/api/student-enrollments/by-subclass/1?page=0&size=10&sortBy=id&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+### 13. Get Enrollments by SubClass ID (Ant Design Table Format)
+GET {{baseUrl}}/api/student-enrollments/by-subclass/1?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+### 14. Bulk Insert with Different Student IDs
+POST {{baseUrl}}/api/student-enrollments/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [5, 6, 7, 8, 9, 10],
+  "academicYearId": 1,
+  "classId": 2,
+  "subClassId": 2
+}
+
+### 15. Bulk Insert with Duplicate Students (Should Skip)
+POST {{baseUrl}}/api/student-enrollments/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [1, 2, 1, 2],
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 1
+}
+
+### 16. Get Enrollments - Combined Test (Multiple Filters)
+# First by academic year, then by subclass to see the difference
+GET {{baseUrl}}/api/student-enrollments/by-academic-year/1?page=0&size=20
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/api/student-enrollments/by-subclass/1?page=0&size=20
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/api/student-enrollments/by-class/1?page=0&size=20
+Authorization: Bearer {{token}}
+
+### 17. Test Pagination on Filtered Results
+GET {{baseUrl}}/api/student-enrollments/by-academic-year/1?page=0&size=5
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/api/student-enrollments/by-academic-year/1?page=1&size=5
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/api/student-enrollments/by-academic-year/1?page=2&size=5
+Authorization: Bearer {{token}}
+
+### 18. Test Sorting on Filtered Results (Ascending)
+GET {{baseUrl}}/api/student-enrollments/by-subclass/1?page=0&size=10&sortBy=enrolledAt&sortDirection=ASC
+Authorization: Bearer {{token}}
+
+### 19. Test Sorting on Filtered Results (Descending)
+GET {{baseUrl}}/api/student-enrollments/by-subclass/1?page=0&size=10&sortBy=enrolledAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+### 20. Bulk Insert Error Test - Invalid Academic Year
+POST {{baseUrl}}/api/student-enrollments/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [1, 2, 3],
+  "academicYearId": 9999,
+  "classId": 1,
+  "subClassId": 1
+}
+
+### 21. Bulk Insert Error Test - Invalid SubClass
+POST {{baseUrl}}/api/student-enrollments/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [1, 2, 3],
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 9999
+}
+
+### 22. Bulk Insert Error Test - Empty Student Array
+POST {{baseUrl}}/api/student-enrollments/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [],
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 1
+}
+
+### 23. Get Enrollments by Non-Existent Academic Year
+GET {{baseUrl}}/api/student-enrollments/by-academic-year/9999?page=0&size=10
+Authorization: Bearer {{token}}
+
+### 24. Get Enrollments by Non-Existent Class
+GET {{baseUrl}}/api/student-enrollments/by-class/9999?page=0&size=10
+Authorization: Bearer {{token}}
+
+### 25. Get Enrollments by Non-Existent SubClass
+GET {{baseUrl}}/api/student-enrollments/by-subclass/9999?page=0&size=10
+Authorization: Bearer {{token}}
+
+
+### 26. Bulk Transfer Siswa ke Kelas dan Sub Kelas Tujuan
+POST {{baseUrl}}/api/student-enrollments/bulk-transfer
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentIds": [1, 2, 3, 4, 5],
+  "academicYearId": 1,
+  "subClassId": 3,                  // sub kelas tujuan
+  "transferStatus": "MASUK",       // atau NAIK_KELAS, TIDAK_NAIK_KELAS, DROP_OUT, PINDAH_SEKOLAH, LAINNYA
+  "note": "opsional catatan perpindahan"
+}

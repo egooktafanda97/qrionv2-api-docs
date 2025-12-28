@@ -1,0 +1,22 @@
+### Debug iPaymu openTrx (VSCode REST Client)
+POST http://localhost:8081/api/debug/ipaymu/open
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "phone": "081234567890",
+  "email": "test@example.com",
+  "amount": 10000,
+  "notifyUrl": "http://localhost:8081/api/ipaymu/notify/success",
+  "returnUrl": "http://localhost:8081/api/ipaymu/notify/return",
+  "cancelUrl": "http://localhost:8081/api/ipaymu/notify/cancel",
+  "referenceId": "TEST-REF-1234",
+  "paymentMethod": "va",
+  "paymentChannel": "MANDIRI",
+  "product": "Test Product",
+  "qty": 1,
+  "price": 10000
+}
+
+### Curl equivalent
+# curl -X POST 'http://localhost:8081/api/debug/ipaymu/open' -H 'Content-Type: application/json' -d @debug-ipaymu.json

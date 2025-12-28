@@ -1,0 +1,48 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4NjE2NTAyOS1kYjhkLTQ0ZTktOTkwZi0xMjFmZGQ1YThmNDgiLCJpYXQiOjE3NjM4MDE0MjQsImV4cCI6MTc2Mzg4NzgyNH0.SQZQUsDdRkPVtpqI1WxLFTUo252JDZFRpFGgctaRyr4
+
+### List school classes (basic - tanpa relasi)
+GET {{host}}/api/school-classes
+Authorization: Bearer {{token}}
+
+### Get school class by id (basic - tanpa relasi)
+GET {{host}}/api/school-classes/1
+Authorization: Bearer {{token}}
+
+### ===== ENDPOINTS DENGAN RELASI =====
+
+### List school classes dengan sub classes (GET ALL WITH RELATIONS)
+GET {{host}}/api/school-classes/with-subclasses
+Authorization: Bearer {{token}}
+
+### Get school class by id dengan sub classes (GET BY ID WITH RELATIONS)
+GET {{host}}/api/school-classes/1/with-subclasses
+Authorization: Bearer {{token}}
+
+### Create school class
+POST {{host}}/api/school-classes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "code": "X-IPA",
+  "name": "Kelas X IPA",
+  "level": 10,
+  "status": "ACTIVE"
+}
+
+### Update school class
+PUT {{host}}/api/school-classes/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Kelas X IPA - Updated",
+  "level": 10,
+  "status": "ACTIVE"
+}
+
+### Delete school class
+DELETE {{host}}/api/school-classes/1
+Authorization: Bearer {{token}}

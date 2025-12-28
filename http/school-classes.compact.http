@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:8080
+@token = <YOUR_JWT_TOKEN>
+
+###
+# Compact classes list (classes with nested subClass array)
+GET {{baseUrl}}/api/school-classes/compact
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# Get class with subclasses (paginated endpoint already exists)
+GET {{baseUrl}}/api/school-classes/with-subclasses?page=0&size=50
+Authorization: Bearer {{token}}
+Accept: application/json

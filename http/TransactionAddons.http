@@ -1,0 +1,21 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = {{token}}
+
+### List transaction addons
+GET {{host}}/api/transaction-addons
+Authorization: Bearer {{token}}
+
+### Create transaction addon
+POST {{host}}/api/transaction-addons
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "transactionId": 1,
+  "addonId": 1
+}
+
+### Delete transaction addon
+DELETE {{host}}/api/transaction-addons/1
+Authorization: Bearer {{token}}

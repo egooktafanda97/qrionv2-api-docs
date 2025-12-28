@@ -1,0 +1,21 @@
+### List BroadcastRecipient with filters
+GET http://localhost:8080/api/broadcast-recipients/query
+Content-Type: application/json
+
+### Filter by group
+GET http://localhost:8080/api/broadcast-recipients/query?recipientGroup=GROUP_A
+
+### Filter by name
+GET http://localhost:8080/api/broadcast-recipients/query?name=John
+
+### Filter by schedule type
+GET http://localhost:8080/api/broadcast-recipients/query?deliveryType=scheduled
+
+### Filter by send status
+GET http://localhost:8080/api/broadcast-recipients/query?sendStatus=sent
+
+### Filter by date (createdAt)
+GET http://localhost:8080/api/broadcast-recipients/query?createdAt=2025-12-20
+
+### Filter by multiple params
+GET http://localhost:8080/api/broadcast-recipients/query?recipientGroup=GROUP_A&deliveryType=scheduled&sendStatus=sent&name=John&createdAt=2025-12-20

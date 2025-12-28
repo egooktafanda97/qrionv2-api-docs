@@ -1,0 +1,222 @@
+### Parent API Testing
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4NjE2NTAyOS1kYjhkLTQ0ZTktOTkwZi0xMjFmZGQ1YThmNDgiLCJpYXQiOjE3NjM4MDE0MjQsImV4cCI6MTc2Mzg4NzgyNH0.SQZQUsDdRkPVtpqI1WxLFTUo252JDZFRpFGgctaRyr4
+
+### 1. Register Parent (INACTIVE - harus verify OTP dulu)
+POST {{host}}/api/parents/register
+Content-Type: application/json
+
+{
+  "name": "Ego Oktafanda",
+  "phone": "6282284733405",
+  "username": "egooktafanda",
+  "password": "password"
+}
+
+### 2. Verify OTP - Aktivasi Parent & Link ke Students
+POST {{host}}/api/parents/verify-otp
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "phone": "6282284733405",
+  "otpCode": "492682"
+}
+
+### 3. Get All Parents
+GET {{host}}/api/parents
+Authorization: Bearer {{token}}
+
+### 4. Get Parent by ID
+GET {{host}}/api/parents/1
+Authorization: Bearer {{token}}
+
+### 5. Get Parent by Phone
+GET {{host}}/api/parents/phone/6281234567890
+Authorization: Bearer {{token}}
+
+### 6. Delete Parent (Soft Delete)
+DELETE {{host}}/api/parents/1
+Authorization: Bearer {{token}}
+
+### =====================================================
+### Test Cases - Error Handling
+### =====================================================
+
+### Test: Register dengan phone yang tidak ada di Students table
+POST {{host}}/api/parents/register
+Content-Type: application/json
+
+{
+  "name": "Test Parent",
+  "phone": "6289999999999",
+  "username": "testparent",
+  "password": "password123"
+}
+
+### Expected Response: 404 NOT_FOUND
+### {
+###   "success": false,
+###   "message": "Nomor telepon 6289999999999 tidak terdaftar sebagai nomor orang tua siswa. Silakan hubungi pihak sekolah untuk memperbarui data.",
+###   "errorCode": "RESOURCE_NOT_FOUND",
+###   "data": null
+### }
+
+### Test: Register dengan phone yang sudah terdaftar
+POST {{host}}/api/parents/register
+Content-Type: application/json
+
+{
+  "name": "Duplicate Parent",
+  "phone": "6281234567890",
+  "username": "duplicate",
+  "password": "password123"
+}
+
+### Expected Response: 409 CONFLICT
+### {
+###   "success": false,
+###   "message": "Nomor telepon 6281234567890 sudah terdaftar. Silakan gunakan fitur lupa password jika Anda lupa kredensial Anda.",
+###   "errorCode": "DUPLICATE_ENTRY",
+###   "data": null
+### }
+
+### Test: Register dengan username yang sudah digunakan
+POST {{host}}/api/parents/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "phone": "6281111111111",
+  "username": "budisantoso",
+  "password": "password123"
+}
+
+### Expected Response: 409 CONFLICT
+### {
+###   "success": false,
+###   "message": "Username budisantoso sudah digunakan. Silakan pilih username lain.",
+###   "errorCode": "DUPLICATE_ENTRY",
+###   "data": null
+### }
+
+### Test: Verify OTP dengan kode yang salah
+POST {{host}}/api/parents/verify-otp
+Content-Type: application/json
+
+{
+  "phone": "6281234567890",
+  "otpCode": "000000"
+}
+
+### Expected Response: 401 UNAUTHORIZED
+### {
+###   "success": false,
+###   "message": "Kode OTP yang Anda masukkan salah atau sudah kadaluarsa. Silakan periksa kembali atau minta kode baru.",
+###   "errorCode": "AUTH_FAILED",
+###   "data": null
+### }
+
+### Test: Validasi format phone number
+POST {{host}}/api/parents/register
+Content-Type: application/json
+
+{
+  "name": "Test Parent",
+  "phone": "081234567890",
+  "username": "testphone",
+  "password": "password123"
+}
+
+### Expected Response: 400 BAD_REQUEST
+### {
+###   "success": false,
+###   "message": "Nomor telepon harus dalam format internasional Indonesia (62xxx) dengan panjang 10-15 digit",
+###   "errorCode": "INVALID_INPUT",
+###   "data": null
+### }
+
+### Test: Validasi username format
+POST {{host}}/api/parents/register
+Content-Type: application/json
+
+{
+  "name": "Test Parent",
+  "phone": "6281234567890",
+  "username": "Budi Santoso",
+  "password": "password123"
+}
+
+### Expected Response: 400 BAD_REQUEST
+### {
+###   "success": false,
+###   "message": "Username hanya boleh mengandung huruf kecil, angka, dan underscore",
+###   "errorCode": "INVALID_INPUT",
+###   "data": null
+### }
+
+### Test: Validasi password minimum length
+POST {{host}}/api/parents/register
+Content-Type: application/json
+
+{
+  "name": "Test Parent",
+  "phone": "6281234567890",
+  "username": "testparent",
+  "password": "12345"
+}
+
+### Expected Response: 400 BAD_REQUEST
+### {
+###   "success": false,
+###   "message": "Password harus antara 6-100 karakter",
+###   "errorCode": "INVALID_INPUT",
+###   "data": null
+### }
+
+### =====================================================
+### Workflow Complete - Register → Verify → Get Data
+### =====================================================
+
+### Step 1: Register (pastikan phone ada di Students.parentPhone)
+POST {{host}}/api/parents/register
+Content-Type: application/json
+
+{
+  "name": "Siti Nurhaliza",
+  "phone": "6285678901234",
+  "username": "sitinurhaliza",
+  "password": "secure123"
+}
+
+### Step 2: Cek OTP di log atau database, lalu verify
+POST {{host}}/api/parents/verify-otp
+Content-Type: application/json
+
+{
+  "phone": "6285678901234",
+  "otpCode": "XXXXXX"
+}
+
+### Step 3: Get parent data setelah verifikasi
+GET {{host}}/api/parents/phone/6285678901234
+Authorization: Bearer {{token}}
+
+### Expected Response:
+### {
+###   "success": true,
+###   "message": "Data orang tua berhasil diambil",
+###   "data": {
+###     "id": 1,
+###     "uuid": "...",
+###     "userId": 10,
+###     "name": "Siti Nurhaliza",
+###     "username": "sitinurhaliza",
+###     "phone": "6285678901234",
+###     "userStatus": "ACTIVE",
+###     "totalStudents": 2,
+###     "createdAt": "2025-06-15T10:30:00",
+###     "updatedAt": "2025-06-15T10:35:00"
+###   }
+### }

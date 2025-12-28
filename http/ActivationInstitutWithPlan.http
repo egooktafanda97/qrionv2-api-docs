@@ -1,0 +1,65 @@
+### ActivationInstitut Endpoints - With SubscriptionPlan Relasi
+
+# GET Activation Institut by Institution (with plan details)
+# Returns all activations for the current user's institution, including subscription plan information
+GET http://localhost:8081/api/activation/activation-institut-by-institution
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+###
+
+# GET Active Activation Institut (with plan details)
+# Returns only ACTIVE activations for the current user's institution with full plan data
+GET http://localhost:8081/api/activation/activation-institut-active
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+###
+
+# GET All Activation Institut (Admin - with plan details)
+# Returns all activations across all institutions with complete subscription plan information
+# Requires admin or superadmin role
+GET http://localhost:8081/api/activation/activation-institut-all
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+###
+
+# Response Example with SubscriptionPlan Details
+# {
+#   "id": 1,
+#   "userLimit": 100,
+#   "userAddons": 5,
+#   "startPeriod": "2025-01-01",
+#   "endPeriod": "2025-12-31",
+#   "invoiceNumber": "INV-2025-001",
+#   "status": "ACTIVE",
+#   "isReplace": false,
+#   "createdAt": "2025-12-25T10:00:00",
+#   "updatedAt": "2025-12-25T10:00:00",
+#   "institution": {
+#     "id": 1,
+#     "uuid": "123e4567-e89b-12d3-a456-426614174000",
+#     "institutionName": "School A",
+#     "institutionCode": "SCH-A",
+#     "address": "Jl. Pendidikan No. 1",
+#     "telphone": "081234567890",
+#     "website": "school-a.com",
+#     "active": true,
+#     "activation": true
+#   },
+#   "plan": {
+#     "id": 5,
+#     "name": "Paket Premium 6 Bulan",
+#     "category": "Kategori 1",
+#     "periodMonth": 6,
+#     "price": 5000000.00,
+#     "kuota": 100,
+#     "discount": 10.00
+#   }
+# }
+
+###
+
+# Note: plan field can be null for activations without assigned subscription plan
+# The relationship is optional (nullable), allowing flexibility in activation creation

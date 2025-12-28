@@ -1,0 +1,48 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzOGQ2MGMzNy04MGUwLTRkMGUtOWZjNi0xMzc3NzIxODgxYjEiLCJpYXQiOjE3NjM3ODQ3OTYsImV4cCI6MTc2Mzg3MTE5Nn0.l1CALsVayEvZpg89i_Y8YlArdZVO71IPhEkbVk9Ht80
+
+
+### List sub-classes
+GET {{host}}/api/sub-classes
+Authorization: Bearer {{token}}
+
+### Get sub-class by id
+GET {{host}}/api/sub-classes/2
+Authorization: Bearer {{token}}
+
+### Create sub-class
+POST {{host}}/api/sub-classes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "classId": 1,
+  "name": "Sub Kelas A"
+}
+
+### Create sub-class without code (auto-generate)
+POST {{host}}/api/sub-classes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "classId": 1,
+  "name": "B",
+  "status": "ACTIVE"
+}
+
+### Update sub-class
+PUT {{host}}/api/sub-classes/2
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "classId": 1,
+  "name": "B",
+  "status": "INACTIVE"
+}
+
+### Delete sub-class
+DELETE {{host}}/api/sub-classes/1
+Authorization: Bearer {{token}}

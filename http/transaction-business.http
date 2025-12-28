@@ -1,0 +1,36 @@
+@baseUrl = http://localhost:8080
+@token = {{JWT_TOKEN}}
+@page = 0
+@size = 10
+@sortBy = createdAt
+@sortDirection = DESC
+
+### Transactions: List all for authenticated institution (non-paginated)
+GET {{baseUrl}}/api/transaction-business
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Transactions: Paginated with relations (standard format)
+GET {{baseUrl}}/api/transaction-business/paginated?page={{page}}&size={{size}}&sortBy={{sortBy}}&sortDirection={{sortDirection}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Transactions: Paginated for jQuery DataTable format
+GET {{baseUrl}}/api/transaction-business/paginated?page={{page}}&size={{size}}&sortBy={{sortBy}}&sortDirection={{sortDirection}}
+Authorization: Bearer {{token}}
+Accept: application/json
+format: jquery-datatable
+
+draw: 1
+
+### Transactions: Paginated for Ant Design Table format
+GET {{baseUrl}}/api/transaction-business/paginated?page={{page}}&size={{size}}&sortBy={{sortBy}}&sortDirection={{sortDirection}}
+Authorization: Bearer {{token}}
+Accept: application/json
+format: ant-table
+
+### Transactions: Paginated with optional filters (institution-scoped)
+# Available filters: nis, nama, tahunAkademik, status, invoiceNumber, referenceNumber
+GET {{baseUrl}}/api/transaction-business/paginated?page={{page}}&size={{size}}&sortBy={{sortBy}}&sortDirection={{sortDirection}}&nis=&nama=&tahunAkademik=&status=&invoiceNumber=&referenceNumber=
+Authorization: Bearer {{token}}
+Accept: application/json

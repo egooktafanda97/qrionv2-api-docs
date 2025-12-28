@@ -1,0 +1,390 @@
+### Authentication API Testing
+
+### Variables
+@baseUrl = http://localhost:8081/api/auth
+@telephone = 081234567890
+@otp = 123456
+
+### ===========================================
+### 1. REGISTER - Step 1: Register new user and send OTP
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "institutionCode": "SCH001",
+  "institutionName": "SMA Negeri 1 Jakarta",
+  "district": "Menteng",
+  "city": "Jakarta Pusat",
+  "statusNegeri": true,
+  "name": "Budi Santoso",
+  "telephone": "{{telephone}}",
+  "email": "budi.santoso@example.com",
+  "positionId": 1
+}
+
+### ===========================================
+### 2. RESEND OTP - Step 2: Resend OTP if user didn't receive it
+POST {{baseUrl}}/resend-otp
+Content-Type: application/json
+
+{
+  "telephone": "{{telephone}}"
+}
+
+### ===========================================
+### 3. VERIFY OTP - Step 3: Verify OTP and get JWT token (Auto Login)
+### NOTE: Replace OTP with actual code from WhatsApp
+POST {{baseUrl}}/verify-otp?telephone={{telephone}}&otp={{otp}}
+
+### ===========================================
+### 4. SET PASSWORD - Step 4 (Optional): Set/Update password (AUTHENTICATED - requires token)
+### NOTE: Must be authenticated - use token from verify-otp or login
+### Headers: Authorization: Bearer <your-token-here>
+POST {{baseUrl}}/set-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "password": "Password123!",
+  "passwordConfirm": "Password123!"
+}
+
+### ===========================================
+### 5. LOGIN - Login with telephone and password
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "userIdentity": "{{telephone}}",
+  "password": "Password123!"
+}
+
+### ===========================================
+### 6. FORGOT PASSWORD - Step 1: Request password reset OTP
+POST {{baseUrl}}/forgot-password
+Content-Type: application/json
+
+{
+  "telephone": "{{telephone}}"
+}
+
+### ===========================================
+### 7. RESET PASSWORD - Step 2: Reset password with OTP
+### NOTE: Replace OTP with actual code from WhatsApp
+POST {{baseUrl}}/reset-password
+Content-Type: application/json
+
+{
+  "telephone": "{{telephone}}",
+  "otpCode": "{{otp}}",
+  "password": "NewPassword123!",
+  "passwordConfirm": "NewPassword123!"
+}
+
+### ===========================================
+### 8. LOGIN - Login with new password after reset
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "userIdentity": "{{telephone}}",
+  "password": "NewPassword123!"
+}
+
+### ===========================================
+### 5. LOGIN - Login with email and password
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "userIdentity": "budi.santoso@example.com",
+  "password": "Password123!"
+}
+
+### ===========================================
+### 6. LOGIN - Login with username and password
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "userIdentity": "081234567890",
+  "password": "Password123!"
+}
+
+### ===========================================
+### ERROR CASES
+### ===========================================
+
+### 9. REGISTER - Duplicate telephone number
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "institutionCode": "SCH002",
+  "institutionName": "SMA Negeri 2 Jakarta",
+  "district": "Tanah Abang",
+  "city": "Jakarta Pusat",
+  "statusNegeri": true,
+  "name": "Siti Nurhaliza",
+  "telephone": "{{telephone}}",
+  "email": "siti.nurhaliza@example.com",
+  "positionId": 1
+}
+
+### ===========================================
+### 10. RESEND OTP - User not found
+POST {{baseUrl}}/resend-otp
+Content-Type: application/json
+
+{
+  "telephone": "081999999999"
+}
+
+### ===========================================
+### 11. RESEND OTP - User already active
+POST {{baseUrl}}/resend-otp
+Content-Type: application/json
+
+{
+  "telephone": "{{telephone}}"
+}
+
+### ===========================================
+### 12. VERIFY OTP - Invalid OTP code
+POST {{baseUrl}}/verify-otp?telephone={{telephone}}&otp=999999
+
+### ===========================================
+### 13. VERIFY OTP - User not found
+POST {{baseUrl}}/verify-otp?telephone=081999999999&otp={{otp}}
+
+### ===========================================
+### 14. FORGOT PASSWORD - User not found
+POST {{baseUrl}}/forgot-password
+Content-Type: application/json
+
+{
+  "telephone": "081999999999"
+}
+
+### ===========================================
+### 15. FORGOT PASSWORD - User not active
+POST {{baseUrl}}/forgot-password
+Content-Type: application/json
+
+{
+  "telephone": "081234567890"
+}
+
+### ===========================================
+### 16. RESET PASSWORD - Invalid OTP
+POST {{baseUrl}}/reset-password
+Content-Type: application/json
+
+{
+  "telephone": "{{telephone}}",
+  "otpCode": "999999",
+  "password": "NewPassword123!",
+  "passwordConfirm": "NewPassword123!"
+}
+
+### ===========================================
+### 17. RESET PASSWORD - Password mismatch
+POST {{baseUrl}}/reset-password
+Content-Type: application/json
+
+{
+  "telephone": "{{telephone}}",
+  "otpCode": "{{otp}}",
+  "password": "NewPassword123!",
+  "passwordConfirm": "DifferentPassword123!"
+}
+
+### ===========================================
+### 18. SET PASSWORD - Password mismatch (AUTHENTICATED)
+POST {{baseUrl}}/set-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "password": "Password123!",
+  "passwordConfirm": "DifferentPassword123!"
+}
+
+### ===========================================
+### 19. SET PASSWORD - Unauthorized (No token)
+POST {{baseUrl}}/set-password
+Content-Type: application/json
+
+{
+  "password": "Password123!",
+  "passwordConfirm": "Password123!"
+}
+
+### ===========================================
+### 20. LOGIN - Wrong password
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "userIdentity": "{{telephone}}",
+  "password": "WrongPassword123!"
+}
+
+### ===========================================
+### 21. LOGIN - User not found
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "userIdentity": "nonexistent@example.com",
+  "password": "Password123!"
+}
+
+### ===========================================
+### VALIDATION ERROR CASES
+### ===========================================
+
+### 22. REGISTER - Missing required fields
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "institutionCode": "",
+  "institutionName": "",
+  "district": "",
+  "city": "",
+  "name": ""
+}
+
+### ===========================================
+### 23. REGISTER - Invalid email format
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "institutionCode": "SCH003",
+  "institutionName": "SMA Negeri 3 Jakarta",
+  "district": "Kemayoran",
+  "city": "Jakarta Pusat",
+  "statusNegeri": false,
+  "name": "Ahmad Wijaya",
+  "telephone": "081298765432",
+  "email": "invalid-email-format",
+  "positionId": 1
+}
+
+### ===========================================
+### 24. RESET PASSWORD - Password too short
+POST {{baseUrl}}/reset-password
+Content-Type: application/json
+
+{
+  "telephone": "{{telephone}}",
+  "otpCode": "{{otp}}",
+  "password": "12345",
+  "passwordConfirm": "12345"
+}
+
+### ===========================================
+### 25. SET PASSWORD - Password too short (AUTHENTICATED)
+POST {{baseUrl}}/set-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "password": "12345",
+  "passwordConfirm": "12345"
+}
+
+### ===========================================
+### 26. LOGIN - Empty credentials
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "userIdentity": "",
+  "password": ""
+}
+
+### ===========================================
+### COMPLETE FLOW TEST
+### ===========================================
+
+### FLOW 1: Complete registration flow with OTP verification
+### Step 1: Register and send OTP
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "institutionCode": "TEST001",
+  "institutionName": "Test School Jakarta",
+  "district": "Test District",
+  "city": "Jakarta",
+  "statusNegeri": true,
+  "name": "Test User",
+  "telephone": "081999888777",
+  "email": "testuser@example.com",
+  "positionId": 1
+}
+
+### Step 2: Resend OTP if needed
+POST {{baseUrl}}/resend-otp
+Content-Type: application/json
+
+{
+  "telephone": "081999888777"
+}
+
+### Step 3: Verify OTP and get JWT token (Auto Login)
+### Replace OTP with actual value from WhatsApp
+POST {{baseUrl}}/verify-otp?telephone=081999888777&otp=123456
+
+### Step 4 (Optional): Set password later if needed (AUTHENTICATED - use token from step 3)
+POST {{baseUrl}}/set-password
+Authorization: Bearer <token-from-step-3>
+Content-Type: application/json
+
+{
+  "password": "TestPass123!",
+  "passwordConfirm": "TestPass123!"
+}
+
+### Step 5: Login with password (after setting password)
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "userIdentity": "081999888777",
+  "password": "TestPass123!"
+}
+
+### ===========================================
+### FLOW 2: Password reset flow
+### Step 1: Request password reset OTP
+POST {{baseUrl}}/forgot-password
+Content-Type: application/json
+
+{
+  "telephone": "081999888777"
+}
+
+### Step 2: Reset password with OTP
+### Replace OTP with actual value from WhatsApp
+POST {{baseUrl}}/reset-password
+Content-Type: application/json
+
+{
+  "telephone": "081999888777",
+  "otpCode": "123456",
+  "password": "NewTestPass123!",
+  "passwordConfirm": "NewTestPass123!"
+}
+
+### Step 3: Login with new password
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "userIdentity": "081999888777",
+  "password": "NewTestPass123!"
+}

@@ -1,0 +1,88 @@
+### iPaymu Payment Notification API
+
+### Variables
+@baseUrl = http://localhost:8081/api/ipaymu/notify
+@token = Bearer YOUR_JWT_TOKEN_HERE
+
+### ============================================================
+### 1. Payment Success Notification (dengan pengecekan PAID status)
+### ============================================================
+### Jika reference_number sudah status PAID di transaction_business,
+### maka akan return pesan "sudah dibayar sebelumnya"
+### 
+### Payload dari iPaymu Gateway:
+POST {{baseUrl}}/success
+Content-Type: application/json
+
+{
+  "statusCode": 1,
+  "statusMessage": "Transaksi berhasil",
+  "referenceId": "TRX-2025-001",
+  "transactionId": "12345678",
+  "invoiceNumber": "INV-2025-001",
+  "amount": 5000000,
+  "currency": "IDR",
+  "timestamp": "2025-12-25T21:00:00",
+  "buyerName": "School Name",
+  "buyerPhone": "081234567890",
+  "buyerEmail": "admin@school.com",
+  "description": "Subscription Plan + Addons",
+  "paymentMethod": "cc"
+}
+
+### Responses:
+
+### SUCCESS - Pertama kali dibayar:
+{
+  "success": true,
+  "message": "Payment processed successfully",
+  "timestamp": "2025-12-25T21:00:00",
+  "data": {
+    "transactionId": "...",
+    "status": "Paid",
+    "activationDate": "2025-12-25",
+    "activationPeriod": "1 Tahun"
+  }
+}
+
+### SUCCESS - Sudah dibayar sebelumnya:
+{
+  "success": true,
+  "message": "Transaksi dengan reference number TRX-2025-001 sudah dibayar sebelumnya",
+  "timestamp": "2025-12-25T21:00:00",
+  "data": null
+}
+
+### ERROR - Status code bukan 1:
+{
+  "success": false,
+  "message": "Payment not successful",
+  "errorCode": "EXTERNAL_SERVICE_ERROR",
+  "timestamp": "2025-12-25T21:00:00"
+}
+
+### ============================================================
+### 2. Payment Return Notification (Callback saat user kembali)
+### ============================================================
+POST {{baseUrl}}/return
+Content-Type: application/json
+
+{
+  "statusCode": 1,
+  "referenceId": "TRX-2025-001",
+  "transactionId": "12345678"
+}
+
+### ============================================================
+### 3. Payment Success by Addons Only
+### ============================================================
+POST {{baseUrl}}/success-by-addons
+Content-Type: application/json
+
+{
+  "statusCode": 1,
+  "statusMessage": "Transaksi berhasil",
+  "referenceId": "TRX-ADDON-001",
+  "amount": 500000,
+  "currency": "IDR"
+}

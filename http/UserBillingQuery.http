@@ -1,0 +1,20 @@
+### Query user billings by academic year and optional class/subclass
+GET http://localhost:8081/api/user-billings/query?academicYearId={{academicYearId}}&classId={{classId}}&subClassId={{subClassId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Examples
+# All billings for AY 2024/2025
+GET http://localhost:8081/api/user-billings/query?academicYearId=1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+# Filter by class only
+GET http://localhost:8081/api/user-billings/query?academicYearId=1&classId=10
+Authorization: Bearer {{token}}
+Accept: application/json
+
+# Filter by subclass only
+GET http://localhost:8081/api/user-billings/query?academicYearId=1&subClassId=100
+Authorization: Bearer {{token}}
+Accept: application/json

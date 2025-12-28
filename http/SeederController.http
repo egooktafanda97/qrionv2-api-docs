@@ -1,0 +1,86 @@
+### Master Data Seeder API Testing
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0ZGM1Yjk1OS1hZmJiLTRlZGItOGExMy1hOTQxZGI5MmJjMjQiLCJpYXQiOjE3NjM4NjQxNDIsImV4cCI6MTc2Mzk1MDU0Mn0.8BNhbclI1gb4KJnga_9wwbrT2Sps-k1sgsS3W1gM9jI
+@yayasanId = 1
+@institutionId = 1
+
+###
+### SEEDER API ENDPOINTS
+###
+
+### Get Seeder Info
+GET {{host}}/api/seed/info
+Authorization: Bearer {{token}}
+
+### Seed All Master Data (Academic Year, Semesters, Classes, Parents, Students)
+# Generate 1 Academic Year, 2 Semesters, 3 Classes, 6 Sub-Classes, 18 Parents, 20 Students
+POST {{host}}/api/seed/all?yayasanId={{yayasanId}}&institutionId={{institutionId}}
+Authorization: Bearer {{token}}
+
+###
+### VERIFICATION - Check Generated Data
+###
+
+### Verify Academic Years
+GET {{host}}/api/academic-years?page=0&size=10
+Authorization: Bearer {{token}}
+
+### Verify Semesters (Ganjil & Genap)
+GET {{host}}/api/semesters?page=0&size=10
+Authorization: Bearer {{token}}
+
+### Verify School Classes (Kelas 1, 2, 3)
+GET {{host}}/api/school-classes?page=0&size=10
+Authorization: Bearer {{token}}
+
+### Verify Sub Classes (1A, 1B, 2A, 2B, 3A, 3B)
+GET {{host}}/api/sub-classes?page=0&size=10
+Authorization: Bearer {{token}}
+
+### Verify Parents (18 total)
+GET {{host}}/api/parents?page=0&size=20
+Authorization: Bearer {{token}}
+
+### Verify Students (20 total)
+GET {{host}}/api/students?page=0&size=20
+Authorization: Bearer {{token}}
+
+###
+### NOTES & DOCUMENTATION
+###
+
+# SEEDER STRUCTURE (Modular - Each seeder in separate class):
+# 
+# Factory & Seeders:
+# 1. DataFactory.java - Factory untuk generate fake data dengan JavaFaker
+# 2. AcademicYearSeeder.java - Seed 1 academic year (2024/2025)
+# 3. SemesterSeeder.java - Seed 2 semesters (Ganjil: Jul-Dec, Genap: Jan-Jun)
+# 4. SchoolClassSeeder.java - Seed 3 school classes (Kelas 1, 2, 3)
+# 5. SubClassSeeder.java - Seed 6 sub classes (1A, 1B, 2A, 2B, 3A, 3B)
+# 6. ParentSeeder.java - Seed 18 parents dengan user accounts
+# 7. StudentSeeder.java - Seed 20 students (18 with unique parents + 2 sharing 1 parent)
+# 8. StudentEnrollmentSeeder.java - Seed 20 enrollments (distribute students to sub-classes)
+# 9. MasterDataSeeder.java - Orchestrator untuk jalankan semua seeder berurutan
+#
+# Data Generated:
+# - 1 Academic Year (2024/2025)
+# - 2 Semesters (Ganjil & Genap)
+# - 3 School Classes (Level 1, 2, 3)
+# - 6 Sub Classes (1A, 1B, 2A, 2B, 3A, 3B)
+# - 18 Parents (with user accounts)
+# - 20 Students (18 unique parents + 1 parent with 2 students)
+# - 20 Enrollments (students distributed evenly across sub-classes)
+#
+# Default Credentials:
+# - Password: "password" (bcrypt encrypted)
+# - Username: auto-generated from name
+# - UserType: USER
+# - Status: ACTIVE
+#
+# Features:
+# - Modular design (each seeder is independent)
+# - Reusable (can be called individually or together)
+# - Transactional (rollback on error)
+# - Detailed logging with ASCII art summary
+# - Indonesian locale for fake data generation

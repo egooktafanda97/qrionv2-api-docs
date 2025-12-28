@@ -1,0 +1,59 @@
+### Activation & Addon Installed API Testing
+
+### Variables
+@baseUrl = http://localhost:8081/api/activation
+@token = Bearer YOUR_JWT_TOKEN_HERE
+
+### ============================================================
+### 1. Get Institution Activation Info
+### ============================================================
+GET {{baseUrl}}
+Authorization: {{token}}
+
+### ============================================================
+### 2. Get Addons Installed by Current Institution Login
+### Menampilkan semua addon yang terinstall di institusi yang sedang login
+### Dengan detail relasi: Addon (master), Yayasan, Institution
+### ============================================================
+GET {{baseUrl}}/addons-by-institution
+Authorization: {{token}}
+
+### ============================================================
+### 3. Get Active Addons (ENABLED) for Current Institution
+### Hanya menampilkan addon dengan status ENABLED
+### Dengan detail relasi lengkap termasuk Addon master data
+### ============================================================
+GET {{baseUrl}}/addons-active
+Authorization: {{token}}
+
+### ============================================================
+### 4. Get All Addons Installed (Admin/SuperAdmin)
+### Menampilkan semua addon dari semua institusi dengan detail lengkap
+### Termasuk relasi ke Addon master data
+### ============================================================
+GET {{baseUrl}}/addons-installed
+Authorization: {{token}}
+
+### ============================================================
+### 5. Get ActivationInstitut by Current Institution Login
+### Menampilkan semua activation institut untuk institusi yang sedang login
+### Dengan detail relasi Institution
+### ============================================================
+GET {{baseUrl}}/activation-institut-by-institution
+Authorization: {{token}}
+
+### ============================================================
+### 6. Get Active ActivationInstitut (STATUS = ACTIVE)
+### Hanya menampilkan activation institut dengan status ACTIVE
+### Dengan detail relasi Institution
+### ============================================================
+GET {{baseUrl}}/activation-institut-active
+Authorization: {{token}}
+
+### ============================================================
+### 7. Get All ActivationInstitut (Admin/SuperAdmin)
+### Menampilkan semua activation institut dari semua institusi
+### Dengan detail relasi Institution lengkap
+### ============================================================
+GET {{baseUrl}}/activation-institut-all
+Authorization: {{token}}

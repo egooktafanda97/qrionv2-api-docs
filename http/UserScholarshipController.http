@@ -1,0 +1,269 @@
+### User Scholarship API Testing
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxN2ZlYWI3Ny1jZTgyLTRkMjQtOTI4ZC0xYzEzYjFjZWE4ZDEiLCJpYXQiOjE3NjM5NDU3NzYsImV4cCI6MTc2NDAzMjE3Nn0.t5g0Sb1bHsDf3828DagbjoMpKe0oneU2Em_Id6WwjlY
+@userId1 = 1
+@userId2 = 2
+@userId3 = 3
+@scholarshipId = 1
+
+###
+### USER SCHOLARSHIP CRUD ENDPOINTS
+###
+
+### 1. List All User Scholarships (Paginated - Standard Format)
+GET {{host}}/api/user-scholarships?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 2. List All User Scholarships (jQuery DataTable Format)
+GET {{host}}/api/user-scholarships?page=0&size=10&sortBy=awardedDate&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+Content-Type: {{contentType}}
+
+### 3. List All User Scholarships (Ant Design Table Format)
+GET {{host}}/api/user-scholarships?page=0&size=10&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+Content-Type: {{contentType}}
+
+### 4. Get User Scholarship by ID
+GET {{host}}/api/user-scholarships/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 5. Get All Scholarships by User ID
+# Mendapatkan semua beasiswa yang diterima oleh seorang user
+GET {{host}}/api/user-scholarships/user/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 6. Get All Users by Scholarship ID
+# Mendapatkan semua user yang menerima beasiswa tertentu
+GET {{host}}/api/user-scholarships/scholarship/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+###
+### CREATE USER SCHOLARSHIP (Award Scholarship to User)
+###
+
+### 7. Assign Scholarship to User - Success
+POST {{host}}/api/user-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "userId": 1,
+  "scholarshipId": 1,
+  "awardedDate": "2025-01-15"
+}
+
+### 8. Assign Scholarship - User Not Found
+POST {{host}}/api/user-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "userId": 99999,
+  "scholarshipId": 1,
+  "awardedDate": "2025-01-15"
+}
+
+### 9. Assign Scholarship - Scholarship Not Found
+POST {{host}}/api/user-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "userId": 1,
+  "scholarshipId": 99999,
+  "awardedDate": "2025-01-15"
+}
+
+### 10. Assign Scholarship - Duplicate Entry
+# User already has this scholarship
+POST {{host}}/api/user-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "userId": 1,
+  "scholarshipId": 1,
+  "awardedDate": "2025-01-20"
+}
+
+### 11. Assign Scholarship - Missing Required Fields
+POST {{host}}/api/user-scholarships
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "userId": 1,
+  "awardedDate": "2025-01-20"
+}
+
+###
+### UPDATE USER SCHOLARSHIP
+###
+
+### 12. Update User Scholarship - Success
+PUT {{host}}/api/user-scholarships/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "userId": 1,
+  "scholarshipId": 2,
+  "awardedDate": "2025-02-01"
+}
+
+### 13. Update User Scholarship - Not Found
+PUT {{host}}/api/user-scholarships/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "userId": 1,
+  "scholarshipId": 1,
+  "awardedDate": "2025-02-01"
+}
+
+###
+### DELETE USER SCHOLARSHIP
+###
+
+### 14. Delete User Scholarship - Success
+DELETE {{host}}/api/user-scholarships/2
+Authorization: Bearer {{token}}
+
+### 15. Delete User Scholarship - Not Found
+DELETE {{host}}/api/user-scholarships/99999
+Authorization: Bearer {{token}}
+
+###
+### BULK OPERATIONS (Checkbox Selection)
+###
+
+### 16. Bulk Award Scholarship to Multiple Users - Success
+# Use case: Admin selects 3 users via checkbox, awards "Beasiswa Prestasi"
+POST {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": ["{{userId1}}", "{{userId2}}", "{{userId3}}"],
+  "scholarshipId": {{scholarshipId}},
+  "awardedDate": "2025-01-15"
+}
+
+### 17. Bulk Award Scholarship - Mixed IDs and UUIDs
+# Users can be specified as integer IDs or UUID strings
+POST {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": [
+    "1",
+    "2",
+    "17feab77-ce82-4d24-928d-1c13b1cea8d1"
+  ],
+  "scholarshipId": 1,
+  "awardedDate": "2025-01-20"
+}
+
+### 18. Bulk Award Scholarship - Partial Failure
+# Some users succeed, some fail (e.g., already have scholarship, not found)
+POST {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": ["1", "2", "999", "9999"],
+  "scholarshipId": 1,
+  "awardedDate": "2025-01-25"
+}
+
+### 19. Bulk Award Scholarship - Empty Users List
+# Should fail validation
+POST {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": [],
+  "scholarshipId": 1,
+  "awardedDate": "2025-01-30"
+}
+
+### 20. Bulk Award Scholarship - Invalid User Identifier
+# Neither valid integer ID nor valid UUID
+POST {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": ["abc123", "not-a-uuid"],
+  "scholarshipId": 1,
+  "awardedDate": "2025-02-01"
+}
+
+### 21. Bulk Award Scholarship - Missing Required Fields
+# scholarshipId is required
+POST {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": ["1", "2", "3"],
+  "awardedDate": "2025-02-05"
+}
+
+### 22. Bulk Award Scholarship - Invalid Date
+# awardedDate cannot be null
+POST {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": ["1", "2"],
+  "scholarshipId": 1
+}
+
+### 23. Bulk Update User Scholarships - Success
+# Update existing scholarships to new scholarship
+PUT {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": ["1", "2"],
+  "scholarshipId": 2,
+  "awardedDate": "2025-02-10"
+}
+
+### 24. Bulk Update - User Without Scholarship
+# Should fail for users who don't have any scholarship
+PUT {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": ["999"],
+  "scholarshipId": 2,
+  "awardedDate": "2025-02-15"
+}
+
+### 25. Bulk Update - Partial Success
+# Mix of users with and without existing scholarships
+PUT {{host}}/api/user-scholarships/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "users": ["1", "2", "999", "9999"],
+  "scholarshipId": 3,
+  "awardedDate": "2025-02-20"
+}

@@ -1,0 +1,342 @@
+### Student Enrollment API Testing - NEW BUSINESS LOGIC
+### Base URL: http://localhost:8081
+
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.your-actual-token-here
+
+###
+### BUSINESS LOGIC EXPLANATION:
+### - StudentEnrollment = Current active enrollment (hanya 1 record per student)
+### - StudentTransferHistory = History of old enrollments
+### 
+### When creating enrollment:
+### 1. If student is NEW (no existing enrollment):
+###    - transferStatus MUST be "MASUK"
+###    - Creates new enrollment record
+### 
+### 2. If student ALREADY HAS enrollment:
+###    - transferStatus MUST be: NAIK_KELAS, TIDAK_NAIK_KELAS, DROP_OUT, or PINDAH_SEKOLAH
+###    - Old enrollment will be DELETED
+###    - Old data will be MOVED to t_student_transfer_history with the given status
+###    - New enrollment will be CREATED
+###
+
+### ===========================================
+### 1. CREATE ENROLLMENT - FIRST TIME (MASUK)
+### ===========================================
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 1,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "transferStatus": "MASUK"
+}
+
+### Expected Result:
+# - New enrollment created
+# - No transfer history (because it's first time)
+# - Response: enrollment data with status 201 Created
+
+### ===========================================
+### 2. CREATE ENROLLMENT - NAIK KELAS
+### (Student already has enrollment)
+### ===========================================
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 2,
+  "classId": 2,
+  "subClassId": 1,
+  "enrolledAt": "2026-07-01T08:00:00",
+  "transferStatus": "NAIK_KELAS"
+}
+
+### Expected Result:
+# - Old enrollment (year 1, class 1) DELETED
+# - Old data MOVED to t_student_transfer_history:
+#   {
+#     "studentId": 1,
+#     "academicYear": {id: 1, name: "2025/2026"},
+#     "fromClassId": 1,
+#     "toClassId": null,
+#     "transferStatus": "NAIK_KELAS",
+#     "note": "Naik kelas dari Kelas 1",
+#     "transferredAt": "2026-07-01T08:00:00"
+#   }
+# - New enrollment (year 2, class 2) CREATED
+# - Response: new enrollment data with status 201 Created
+
+### ===========================================
+### 3. CREATE ENROLLMENT - TIDAK NAIK KELAS
+### (Student stays in same class)
+### ===========================================
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 2,
+  "classId": 1,
+  "subClassId": 1,
+  "enrolledAt": "2026-07-01T08:00:00",
+  "transferStatus": "TIDAK_NAIK_KELAS"
+}
+
+### Expected Result:
+# - Old enrollment DELETED
+# - Old data MOVED to history with status "TIDAK_NAIK_KELAS"
+# - Note: "Tidak naik kelas, tetap di Kelas 1"
+# - New enrollment CREATED (same class)
+
+### ===========================================
+### 4. CREATE ENROLLMENT - PINDAH SEKOLAH
+### (Student transfers to another school/institution)
+### ===========================================
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 2,
+  "classId": 3,
+  "subClassId": 2,
+  "enrolledAt": "2026-07-01T08:00:00",
+  "transferStatus": "PINDAH_SEKOLAH"
+}
+
+### Expected Result:
+# - Old enrollment DELETED
+# - Old data MOVED to history with status "PINDAH_SEKOLAH"
+# - Note: "Pindah sekolah dari Kelas X"
+# - New enrollment CREATED
+
+### ===========================================
+### 5. CREATE ENROLLMENT - DROP OUT
+### (Student drops out)
+### ===========================================
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 2,
+  "classId": 1,
+  "enrolledAt": "2026-07-01T08:00:00",
+  "transferStatus": "DROP_OUT"
+}
+
+### Expected Result:
+# - Old enrollment DELETED
+# - Old data MOVED to history with status "DROP_OUT"
+# - Note: "Drop out dari Kelas X"
+# - New enrollment CREATED
+
+### ===========================================
+### GET ENDPOINTS (unchanged)
+### ===========================================
+
+### 6. List All Student Enrollments (Current Active Only)
+GET {{host}}/api/student-enrollments?page=0&size=10
+Authorization: Bearer {{token}}
+
+### 7. Get Student Enrollment by ID
+GET {{host}}/api/student-enrollments/1
+Authorization: Bearer {{token}}
+
+### 8. Get Current Enrollment for Student
+GET {{host}}/api/student-enrollments/student/1
+Authorization: Bearer {{token}}
+
+### Expected Result: Only shows CURRENT active enrollment (not history)
+
+### ===========================================
+### TRANSFER HISTORY ENDPOINTS
+### ===========================================
+
+### 9. Get All Transfer History for Student
+GET {{host}}/api/student-enrollments/transfer-history/student/1
+Authorization: Bearer {{token}}
+
+### Expected Result: Shows ALL old enrollments that were moved to history
+
+### 10. Get Transfer History by ID
+GET {{host}}/api/student-enrollments/transfer-history/1
+Authorization: Bearer {{token}}
+
+### 11. Get All Transfer History by Academic Year
+GET {{host}}/api/student-enrollments/transfer-history/academic-year/1
+Authorization: Bearer {{token}}
+
+### ===========================================
+### ERROR SCENARIOS
+### ===========================================
+
+### 12. ERROR: Use MASUK for existing student (should fail)
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 2,
+  "classId": 2,
+  "enrolledAt": "2026-07-01T08:00:00",
+  "transferStatus": "MASUK"
+}
+
+### Expected Error:
+# {
+#   "success": false,
+#   "message": "Status MASUK hanya untuk siswa baru. Gunakan status: NAIK_KELAS, TIDAK_NAIK_KELAS, DROP_OUT, atau PINDAH_SEKOLAH",
+#   "errorCode": 4001,
+#   "status": 400
+# }
+
+### 13. ERROR: Use NAIK_KELAS for new student (should fail)
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 999,
+  "academicYearId": 1,
+  "classId": 1,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "transferStatus": "NAIK_KELAS"
+}
+
+### Expected Error:
+# {
+#   "success": false,
+#   "message": "Siswa baru harus menggunakan status MASUK",
+#   "errorCode": 4001,
+#   "status": 400
+# }
+
+### 14. ERROR: Missing transferStatus
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 1,
+  "classId": 1,
+  "enrolledAt": "2025-07-01T08:00:00"
+}
+
+### Expected Error:
+# {
+#   "success": false,
+#   "message": "Status mutasi wajib diisi (MASUK, NAIK_KELAS, TIDAK_NAIK_KELAS, DROP_OUT, PINDAH_SEKOLAH)",
+#   "errorCode": 1001,
+#   "status": 400
+# }
+
+### ===========================================
+### COMPLETE WORKFLOW EXAMPLE
+### ===========================================
+
+### Step 1: Create student first enrollment (Year 1, Class 1)
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 1,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "transferStatus": "MASUK"
+}
+
+### Step 2: Check current enrollment
+GET {{host}}/api/student-enrollments/student/1
+Authorization: Bearer {{token}}
+
+### Result: Shows enrollment in Year 1, Class 1
+
+### Step 3: Student naik kelas (Year 2, Class 2)
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 2,
+  "classId": 2,
+  "subClassId": 1,
+  "enrolledAt": "2026-07-01T08:00:00",
+  "transferStatus": "NAIK_KELAS"
+}
+
+### Step 4: Check current enrollment again
+GET {{host}}/api/student-enrollments/student/1
+Authorization: Bearer {{token}}
+
+### Result: NOW shows enrollment in Year 2, Class 2 (Year 1 data is gone)
+
+### Step 5: Check transfer history
+GET {{host}}/api/student-enrollments/transfer-history/student/1
+Authorization: Bearer {{token}}
+
+### Result: Shows old enrollment (Year 1, Class 1) with status NAIK_KELAS
+
+### ===========================================
+### NOTES
+### ===========================================
+
+# IMPORTANT POINTS:
+#
+# 1. ONE ENROLLMENT PER STUDENT:
+#    - t_student_enrollment only stores CURRENT active enrollment
+#    - When creating new enrollment, old one is deleted
+#    - This keeps the table clean and performant
+#
+# 2. TRANSFER HISTORY:
+#    - t_student_transfer_history stores ALL old enrollments
+#    - Useful for reporting, analytics, student profile
+#    - Never deleted, permanent audit trail
+#
+# 3. TRANSFER STATUS VALUES:
+#    - MASUK: First time enrollment (new student)
+#    - NAIK_KELAS: Student promoted to next class
+#    - TIDAK_NAIK_KELAS: Student stays in same class (repeat)
+#    - DROP_OUT: Student dropped out
+#    - PINDAH_SEKOLAH: Student transferred to another school
+#    - LAINNYA: Other status (future use)
+#
+# 4. STATUS VALIDATION:
+#    - New student (no existing enrollment) MUST use MASUK
+#    - Existing student CANNOT use MASUK
+#    - System will throw error if wrong status is used
+#
+# 5. AUTO-GENERATED NOTE:
+#    - System automatically generates note in history
+#    - Note format: "[Status] dari [ClassName]"
+#    - Example: "Naik kelas dari Kelas 1"
+#
+# 6. FILTERING:
+#    - All queries filtered by institution & yayasan
+#    - Users only see data from their institution
+#    - Security enforced at service layer
+#
+# 7. USE CASES:
+#    - Student registration: Use MASUK
+#    - Year-end promotion: Use NAIK_KELAS or TIDAK_NAIK_KELAS
+#    - Student withdrawal: Use DROP_OUT
+#    - School transfer: Use PINDAH_SEKOLAH
+#    - View history: Query transfer-history endpoints

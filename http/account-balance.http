@@ -1,0 +1,29 @@
+@baseUrl = http://localhost:8081
+@token = {{JWT_TOKEN}}
+@accountNumber = 1234567890
+@accountType = BILLING_CASH
+
+### Debug: Check my authorities and roles
+GET {{baseUrl}}/api/debug/me
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Institution: Get balance by account number (same institution, requires INSTITUTION role)
+GET {{baseUrl}}/api/account-balance/institution/by-account-number?accountNumber={{accountNumber}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Me: List balances for logged-in user's accounts
+GET {{baseUrl}}/api/account-balance/me
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Institution: List balances at INSTITUTION level (optional filter by accountType)
+GET {{baseUrl}}/api/account-balance/institution?accountType={{accountType}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### General: Get balance by account number
+GET {{baseUrl}}/api/account-balance/by-account-number?accountNumber={{accountNumber}}
+Authorization: Bearer {{token}}
+Accept: application/json

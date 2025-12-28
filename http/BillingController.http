@@ -1,0 +1,750 @@
+### Environment Variables
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxN2ZlYWI3Ny1jZTgyLTRkMjQtOTI4ZC0xYzEzYjFjZWE4ZDEiLCJpYXQiOjE3NjM5NDU3NzYsImV4cCI6MTc2NDAzMjE3Nn0.t5g0Sb1bHsDf3828DagbjoMpKe0oneU2Em_Id6WwjlY
+
+###
+### BILLING API - CRUD Operations
+###
+
+### 1. Create Billing - MONTHLY Type (Auto-generate name from MBillings)
+POST {{host}}/api/billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY",
+  "mBillingsId": 3
+}
+
+### Expected Response:
+# {
+#   "status": "success",
+#   "message": "Billing berhasil dibuat",
+#   "data": {
+#     "id": 1,
+#     "uuid": "550e8400-e29b-41d4-a716-446655440000",
+#     "billingName": "SPP Bulanan - Bulan November 2025",
+#     "billingType": "MONTHLY",
+#     "collectDate": 1,
+#     "dueDateOffset": 5,
+#     "amount": 500000.00,
+#     "billingCollectDate": "2025-11-01",
+#     "billingDueDate": "2025-11-06",
+#     "isActive": true
+#   }
+# }
+
+###
+### 2. Create Billing - GENERAL Type (Manual input)
+POST {{host}}/api/billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 4,
+  "amount": 750000,
+  "billingCollectDate": "2025-12-01",
+  "billingDueDate": "2025-12-15"
+}
+
+###
+### 3. Generate Monthly Billing - With Specific Month/Year
+# Generate billing untuk MBillings tertentu pada bulan/tahun tertentu
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 3,
+  "year": 2025,
+  "month": 1
+}
+
+### Expected Response:
+# {
+#   "status": "success",
+#   "message": "Billing bulanan berhasil di-generate",
+#   "data": {
+#     "id": 3,
+#     "billingName": "SPP Bulanan - Bulan Desember 2025",
+#     "billingType": "MONTHLY",
+#     "amount": 500000.00,
+#     "billingCollectDate": "2025-12-01",
+#     "billingDueDate": "2025-12-06"
+#   }
+# }
+
+###
+### 4. Generate Monthly Billing - Current Month/Year (Auto-detect)
+# Generate billing untuk MBillings tertentu pada bulan dan tahun SAAT INI
+# Jika tidak ada year/month, akan otomatis menggunakan bulan dan tahun sekarang
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1
+}
+
+### Expected Response (jika sekarang November 2025):
+# {
+#   "status": "success",
+#   "message": "Billing bulanan berhasil di-generate",
+#   "data": {
+#     "id": 4,
+#     "billingName": "SPP Bulanan - Bulan November 2025",
+#     "billingType": "MONTHLY",
+#     "amount": 500000.00,
+#     "billingCollectDate": "2025-11-01",
+#     "billingDueDate": "2025-11-06"
+#   }
+# }
+
+###
+### 5. Generate for Multiple MBillings (Call Multiple Times)
+# Generate billing untuk beberapa MBillings berbeda
+
+# Generate SPP Bulanan untuk Desember 2025
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1,
+  "year": 2025,
+  "month": 12
+}
+
+###
+# Generate Uang Gedung untuk Desember 2025
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 2,
+  "year": 2025,
+  "month": 12
+}
+
+###
+# Generate Ekstrakurikuler untuk Desember 2025
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 3,
+  "year": 2025,
+  "month": 12
+}
+
+###
+### 6. Get All Billings (Filtered by yayasan/institution)
+GET {{host}}/api/billing
+Authorization: Bearer {{token}}
+
+###
+### 7. Get Billing by ID
+GET {{host}}/api/billing/1
+Authorization: Bearer {{token}}
+
+###
+### 8. Get Billing by UUID
+GET {{host}}/api/billing/uuid/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer {{token}}
+
+###
+### 9. Update Billing - MONTHLY Type
+PUT {{host}}/api/billing/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY",
+  "mBillingsId": 2
+}
+
+###
+### 10. Update Billing - GENERAL Type
+PUT {{host}}/api/billing/2
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "GENERAL",
+  "billingName": "Biaya Seragam Lengkap 2025/2026",
+  "amount": 850000,
+  "billingCollectDate": "2025-12-05",
+  "billingDueDate": "2025-12-20"
+}
+
+###
+### 11. Delete Billing (Soft Delete)
+DELETE {{host}}/api/billing/2
+Authorization: Bearer {{token}}
+
+###
+### ERROR SCENARIOS
+###
+
+### Error 1: Generate without mBillingsId
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "year": 2025,
+  "month": 12
+}
+
+### Expected Error:
+# {
+#   "status": "error",
+#   "message": "ID Master Billing Bulanan harus diisi",
+#   "errorCode": "VALIDATION_ERROR-1001"
+# }
+
+###
+### Error 2: Generate for inactive month
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1,
+  "year": 2025,
+  "month": 7
+}
+
+### Expected Error:
+# {
+#   "status": "error",
+#   "message": "Bulan Juli tidak aktif untuk 'SPP Bulanan'",
+#   "errorCode": "STATE_CONFLICT-4002"
+# }
+
+###
+### Error 3: Generate billing that already exists
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1,
+  "year": 2025,
+  "month": 11
+}
+
+### Expected Error (if already generated):
+# {
+#   "status": "error",
+#   "message": "Billing untuk 'SPP Bulanan' bulan November 2025 sudah ada",
+#   "errorCode": "STATE_CONFLICT-4002"
+# }
+
+###
+### Error 4: MBillings not found
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 99999,
+  "year": 2025,
+  "month": 12
+}
+
+### Expected Error:
+# {
+#   "status": "error",
+#   "message": "Master Billing Bulanan dengan ID 99999 tidak ditemukan",
+#   "errorCode": "RESOURCE_NOT_FOUND-3000"
+# }
+
+###
+### Error 5: Create MONTHLY without mBillingsId
+POST {{host}}/api/billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY"
+}
+
+### Expected Error:
+# {
+#   "status": "error",
+#   "message": "Untuk billing MONTHLY, field mBillingsId harus diisi",
+#   "errorCode": "VALIDATION_ERROR-1001"
+# }
+
+###
+### Error 6: Create GENERAL without required fields
+POST {{host}}/api/billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "GENERAL"
+}
+
+### Expected Error:
+# {
+#   "status": "error",
+#   "message": "Untuk billing GENERAL, field billingName, amount, billingCollectDate, dan billingDueDate harus diisi",
+#   "errorCode": "VALIDATION_ERROR-1001"
+# }
+
+###
+### TESTING SCENARIOS
+###
+
+### Scenario 1: Generate Billing for Current Month
+# 1. Pastikan MBillings sudah ada (gunakan MBillingsController.http)
+# 2. Aktifkan bulan saat ini (misalnya bulan 11 untuk November)
+# 3. Generate tanpa year/month (otomatis pakai bulan sekarang)
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1
+}
+
+###
+### Scenario 2: Generate for Specific Future Month
+# Generate billing untuk bulan depan
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1,
+  "year": 2025,
+  "month": 12
+}
+
+###
+### Scenario 3: Generate Multiple Billings for Same Month
+# Call endpoint beberapa kali untuk MBillings berbeda
+
+# SPP Bulanan
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1,
+  "year": 2026,
+  "month": 1
+}
+
+###
+# Uang Gedung  
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 2,
+  "year": 2026,
+  "month": 1
+}
+
+###
+# Ekstrakurikuler
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 3,
+  "year": 2026,
+  "month": 1
+}
+
+###
+### DATA PREPARATION (Create these first)
+###
+
+### Step 1: Create MBillings #1 - SPP Bulanan
+# POST /api/monthly-billing
+# {
+#   "name": "SPP Bulanan",
+#   "collectDate": 1,
+#   "dueDateOffset": 5,
+#   "amount": 500000,
+#   "institutionId": 1
+# }
+
+### Step 2: Activate Months for SPP Bulanan
+# POST /api/monthly-billing/1/activate-months
+# { "months": [11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
+
+### Step 3: Generate Billing for Current Month
+# POST /api/billing/generate-monthly
+# { "mBillingsId": 1 }
+
+### Step 4: Verify Generated Billing
+# GET /api/billing
+
+###
+### KEY DIFFERENCES FROM OLD VERSION:
+###
+# OLD:
+# - Generate semua MBillings sekaligus dalam 1 request
+# - Tidak ada kontrol per MBillings
+# - Sulit track mana yang berhasil/gagal
+#
+# NEW:
+# - Generate 1 MBillings per request
+# - **WAJIB ada mBillingsId** - ini yang membedakan billing mana yang akan digenerate
+# - Year/month opsional (default: bulan/tahun sekarang)
+# - Lebih terstruktur dan mudah di-track
+# - Error handling lebih spesifik per MBillings
+#
+### USAGE WORKFLOW:
+# 1. Buat MBillings (SPP, Uang Gedung, dll)
+# 2. Aktifkan bulan-bulan yang diperlukan
+# 3. Generate billing dengan specify mBillingsId
+# 4. Repeat step 3 untuk setiap MBillings yang mau digenerate
+
+### Expected Response:
+# {
+#   "status": "success",
+#   "message": "Billing berhasil dibuat",
+#   "data": {
+#     "id": 2,
+#     "uuid": "660e8400-e29b-41d4-a716-446655440001",
+#     "billingName": "Biaya Seragam Tahun Ajaran 2025/2026",
+#     "billingType": "GENERAL",
+#     "collectDate": null,
+#     "dueDateOffset": null,
+#     "amount": 750000.00,
+#     "billingCollectDate": "2025-12-01",
+#     "billingDueDate": "2025-12-15",
+#     "isActive": true
+#   }
+# }
+
+###
+### 3. Get All Billings (Filtered by yayasan/institution)
+GET {{host}}/api/billing
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "status": "success",
+#   "message": "Data billing berhasil diambil",
+#   "data": [
+#     {
+#       "id": 1,
+#       "billingName": "SPP Bulanan - Bulan November 2025",
+#       "billingType": "MONTHLY",
+#       "amount": 500000.00,
+#       "yayasan": { "id": 1, "name": "Yayasan Pendidikan ABC" },
+#       "institution": { "id": 1, "name": "SD ABC" }
+#     },
+#     ...
+#   ]
+# }
+
+###
+### 4. Get Billing by ID
+GET {{host}}/api/billing/1
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "status": "success",
+#   "message": "Data billing berhasil diambil",
+#   "data": {
+#     "id": 1,
+#     "uuid": "550e8400-e29b-41d4-a716-446655440000",
+#     "billingName": "SPP Bulanan - Bulan November 2025",
+#     "billingType": "MONTHLY",
+#     "collectDate": 1,
+#     "dueDateOffset": 5,
+#     "amount": 500000.00,
+#     "billingCollectDate": "2025-11-01",
+#     "billingDueDate": "2025-11-06",
+#     "isActive": true,
+#     "yayasan": { "id": 1, "name": "Yayasan Pendidikan ABC" },
+#     "institution": { "id": 1, "name": "SD ABC" },
+#     "mBillingMonthly": {
+#       "id": 1,
+#       "name": "SPP Bulanan",
+#       "amount": 500000.00
+#     }
+#   }
+# }
+
+###
+### 5. Get Billing by UUID
+GET {{host}}/api/billing/uuid/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer {{token}}
+
+###
+### 6. Update Billing - MONTHLY Type
+PUT {{host}}/api/billing/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY",
+  "mBillingsId": 1
+}
+
+### Expected Response:
+# {
+#   "status": "success",
+#   "message": "Billing berhasil diperbarui",
+#   "data": {
+#     "id": 1,
+#     "billingName": "SPP Bulanan Premium - Bulan November 2025",
+#     "billingType": "MONTHLY",
+#     "amount": 750000.00
+#   }
+# }
+
+###
+### 7. Update Billing - GENERAL Type
+PUT {{host}}/api/billing/2
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "GENERAL",
+  "billingName": "Biaya Seragam Lengkap 2025/2026",
+  "amount": 850000,
+  "billingCollectDate": "2025-12-05",
+  "billingDueDate": "2025-12-20"
+}
+
+### Expected Response:
+# {
+#   "status": "success",
+#   "message": "Billing berhasil diperbarui",
+#   "data": {
+#     "id": 2,
+#     "billingName": "Biaya Seragam Lengkap 2025/2026",
+#     "amount": 850000.00,
+#     "billingCollectDate": "2025-12-05",
+#     "billingDueDate": "2025-12-20"
+#   }
+# }
+
+###
+### 8. Delete Billing (Soft Delete)
+DELETE {{host}}/api/billing/2
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "status": "success",
+#   "message": "Billing berhasil dihapus",
+#   "data": null
+# }
+
+###
+### 9. Generate Monthly Billings - DEPRECATED (Use new version above)
+# This is OLD VERSION - should use new version with mBillingsId
+# POST {{host}}/api/billing/generate-monthly
+# Content-Type: {{contentType}}
+# Authorization: {{token}}
+#
+# {
+#   "year": 2025,
+#   "month": 12
+# }
+
+### Expected Response:
+# {
+#   "status": "success",
+#   "message": "Berhasil generate 3 billing untuk bulan Desember 2025",
+#   "data": [
+#     {
+#       "id": 3,
+#       "billingName": "SPP Bulanan - Bulan Desember 2025",
+#       "billingType": "MONTHLY",
+#       "amount": 500000.00,
+#       "billingCollectDate": "2025-12-01",
+#       "billingDueDate": "2025-12-06"
+#     },
+#     {
+#       "id": 4,
+#       "billingName": "Uang Gedung - Bulan Desember 2025",
+#       "billingType": "MONTHLY",
+#       "amount": 1000000.00,
+#       "billingCollectDate": "2025-12-01",
+#       "billingDueDate": "2025-12-11"
+#     },
+#     {
+#       "id": 5,
+#       "billingName": "Kegiatan Ekstrakurikuler - Bulan Desember 2025",
+#       "billingType": "MONTHLY",
+#       "amount": 250000.00,
+#       "billingCollectDate": "2025-12-01",
+#       "billingDueDate": "2025-12-06"
+#     }
+#   ]
+# }
+
+###
+### 10. Generate Monthly Billings for Yayasan Level (All Institutions)
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1
+}
+
+### Note: institutionId kosong = generate untuk semua institution di yayasan
+
+###
+### ERROR SCENARIOS
+###
+
+### Error 1: Create MONTHLY without mBillingsId
+POST {{host}}/api/billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY"
+}
+
+### Expected Error:
+# {
+#   "status": "error",
+#   "message": "Untuk billing MONTHLY, field mBillingsId harus diisi",
+#   "errorCode": "VALIDATION_ERROR-1001"
+# }
+
+###
+### Error 2: Create GENERAL without required fields
+POST {{host}}/api/billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "GENERAL"
+}
+
+### Expected Error:
+# {
+#   "status": "error",
+#   "message": "Untuk billing GENERAL, field billingName, amount, billingCollectDate, dan billingDueDate harus diisi",
+#   "errorCode": "VALIDATION_ERROR-1001"
+# }
+
+###
+### Error 3: MBillings not found
+POST {{host}}/api/billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY",
+  "mBillingsId": 99999
+}
+
+### Expected Error:
+# {
+#   "status": "error",
+#   "message": "Master Billing Bulanan tidak ditemukan atau Anda tidak memiliki akses",
+#   "errorCode": "RESOURCE_NOT_FOUND-3000"
+# }
+
+###
+### Error 4: Generate for inactive month
+POST {{host}}/api/billing/generate-monthly
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "mBillingsId": 1,
+  "year": 2025,
+  "month": 7
+}
+
+### Expected: Skip billings where month is not active
+# {
+#   "status": "success",
+#   "message": "Generate billing selesai. Beberapa billing dilewati karena bulan tidak aktif",
+#   "data": []
+# }
+
+###
+### Error 5: Permission denied - accessing other yayasan's billing
+GET {{host}}/api/billing/999
+Authorization: Bearer {{token}}
+
+### Expected Error:
+# {
+#   "status": "error",
+#   "message": "Billing tidak ditemukan atau Anda tidak memiliki akses",
+#   "errorCode": "RESOURCE_NOT_FOUND-3000"
+# }
+
+###
+### TESTING SCENARIOS
+###
+
+### Scenario 1: Complete MONTHLY Billing Flow
+# 1. Create MBillings first (use MBillingsController.http)
+# 2. Activate months (e.g., month 11, 12)
+# 3. Create MONTHLY billing for current month
+# 4. Verify name format: "{BaseName} - Bulan {IndonesianMonth} {Year}"
+# 5. Verify dates calculated from collectDate and dueDateOffset
+
+###
+### Scenario 2: Bulk Generation
+# 1. Create multiple MBillings with different amounts
+# 2. Activate specific months for each
+# 3. Call generate-monthly for current month
+# 4. Verify all active billings created with correct names
+# 5. Call generate-monthly again - should skip existing billings
+
+###
+### Scenario 3: Cross-Institution Security
+# 1. Login as Institution A user
+# 2. Create billing for Institution A
+# 3. Login as Institution B user
+# 4. Try to access Institution A's billing - should fail
+# 5. Try to update/delete Institution A's billing - should fail
+
+###
+### DATA PREPARATION (Create these first)
+###
+
+### Create MBillings #1 - SPP Bulanan
+# POST /api/monthly-billing
+# {
+#   "name": "SPP Bulanan",
+#   "collectDate": 1,
+#   "dueDateOffset": 5,
+#   "amount": 500000,
+#   "institutionId": 1
+# }
+
+### Create MBillings #2 - Uang Gedung
+# POST /api/monthly-billing
+# {
+#   "name": "Uang Gedung",
+#   "collectDate": 1,
+#   "dueDateOffset": 10,
+#   "amount": 1000000,
+#   "institutionId": 1
+# }
+
+### Activate Months for SPP Bulanan
+# POST /api/monthly-billing/1/activate-months
+# { "months": [11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
+
+### Activate Months for Uang Gedung
+# POST /api/monthly-billing/2/activate-months
+# { "months": [1, 7] }

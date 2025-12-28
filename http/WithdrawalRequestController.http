@@ -1,0 +1,423 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0ZGM1Yjk1OS1hZmJiLTRlZGItOGExMy1hOTQxZGI5MmJjMjQiLCJpYXQiOjE3NjM4NjQxNDIsImV4cCI6MTc2Mzk1MDU0Mn0.8BNhbclI1gb4KJnga_9wwbrT2Sps-k1sgsS3W1gM9jI
+
+###############################################################################
+# WITHDRAWAL REQUEST CONTROLLER
+# 
+# Endpoints untuk mengelola permintaan withdrawal dari yayasan/institusi ke owner:
+# - Create request (POST /)
+# - Get all requests (GET /)
+# - Get by ID (GET /{id})
+# - Update request (PUT /{id}) - only PENDING
+# - Approve/Reject (POST /{id}/approve)
+# - Cancel request (POST /{id}/cancel)
+# - Delete request (DELETE /{id})
+# - Count pending (GET /count/pending)
+###############################################################################
+
+### ============================================================================
+### CREATE WITHDRAWAL REQUEST
+### ============================================================================
+
+### Create new withdrawal request
+POST {{host}}/api/withdrawal-requests
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "otpCode": "1234",
+  "accountNumber": "ACC-BIL-001",
+  "amount": 5000000.00,
+  "note": "Request pencairan dana untuk operasional bulan Januari"
+}
+
+###
+
+### Create withdrawal request - minimal
+POST {{host}}/api/withdrawal-requests
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "otpCode": "1234",
+  "accountNumber": "ACC-BIL-001",
+  "amount": 2500000.00
+}
+
+###
+
+### ============================================================================
+### READ WITHDRAWAL REQUESTS
+### ============================================================================
+
+### Get all withdrawal requests (default pagination)
+GET {{host}}/api/withdrawal-requests
+Authorization: Bearer {{token}}
+
+###
+
+### Get all withdrawal requests - custom pagination
+GET {{host}}/api/withdrawal-requests?page=0&size=20&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### Get withdrawal requests by status - PENDING
+GET {{host}}/api/withdrawal-requests?status=PENDING&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### Get withdrawal requests by status - APPROVED
+GET {{host}}/api/withdrawal-requests?status=APPROVED&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### Get withdrawal requests by status - REJECTED
+GET {{host}}/api/withdrawal-requests?status=REJECTED&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### Get withdrawal requests - jQuery DataTable format
+GET {{host}}/api/withdrawal-requests?page=0&size=10&draw=1&format=jquery-datatable
+Authorization: Bearer {{token}}
+
+###
+
+### Get withdrawal requests - Ant Design Table format
+GET {{host}}/api/withdrawal-requests?page=0&size=10&format=ant-table
+Authorization: Bearer {{token}}
+
+###
+
+### Get withdrawal request by ID
+GET {{host}}/api/withdrawal-requests/1
+Authorization: Bearer {{token}}
+
+###
+
+### ============================================================================
+### UPDATE WITHDRAWAL REQUEST
+### ============================================================================
+
+### Update withdrawal request (only PENDING status can be updated)
+PUT {{host}}/api/withdrawal-requests/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "accountNumber": "ACC-BIL-002",
+  "amount": 6000000.00,
+  "note": "Update: jumlah disesuaikan dengan kebutuhan terbaru"
+}
+
+###
+
+### Update - partial update (only amount)
+PUT {{host}}/api/withdrawal-requests/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "amount": 7000000.00
+}
+
+###
+
+### Update - partial update (only note)
+PUT {{host}}/api/withdrawal-requests/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "note": "Catatan tambahan untuk approval"
+}
+
+###
+
+### ============================================================================
+### APPROVE / REJECT WITHDRAWAL REQUEST
+### ============================================================================
+
+### Approve withdrawal request
+POST {{host}}/api/withdrawal-requests/1/approve
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "action": "APPROVE",
+  "note": "Request disetujui sesuai prosedur"
+}
+
+###
+
+### Approve without note
+POST {{host}}/api/withdrawal-requests/1/approve
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "action": "APPROVE"
+}
+
+###
+
+### Reject withdrawal request
+POST {{host}}/api/withdrawal-requests/2/approve
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "action": "REJECT",
+  "note": "Dana tidak mencukupi untuk periode ini"
+}
+
+###
+
+### Reject with detailed reason
+POST {{host}}/api/withdrawal-requests/2/approve
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "action": "REJECT",
+  "note": "Request ditolak karena:\n1. Belum melewati review periode\n2. Dokumen pendukung belum lengkap\n3. Mohon lengkapi dokumen dan ajukan kembali"
+}
+
+###
+
+### ============================================================================
+### CANCEL WITHDRAWAL REQUEST
+### ============================================================================
+
+### Cancel withdrawal request (by requester)
+POST {{host}}/api/withdrawal-requests/3/cancel?note=Pembatalan karena ada perubahan kebutuhan
+Authorization: Bearer {{token}}
+
+###
+
+### Cancel without note
+POST {{host}}/api/withdrawal-requests/3/cancel
+Authorization: Bearer {{token}}
+
+###
+
+### ============================================================================
+### DELETE WITHDRAWAL REQUEST
+### ============================================================================
+
+### Delete withdrawal request (soft delete)
+DELETE {{host}}/api/withdrawal-requests/4
+Authorization: Bearer {{token}}
+
+###
+
+### ============================================================================
+### STATISTICS & UTILITIES
+### ============================================================================
+
+### Get count of pending requests
+GET {{host}}/api/withdrawal-requests/count/pending
+Authorization: Bearer {{token}}
+
+###
+
+### ============================================================================
+### RESPONSE EXAMPLES
+### ============================================================================
+
+### @name Create Response
+# {
+#   "success": true,
+#   "message": "Withdrawal request created successfully",
+#   "timestamp": "2025-01-15T10:30:00.000Z",
+#   "data": {
+#     "id": 1,
+#     "uuid": "550e8400-e29b-41d4-a716-446655440000",
+#     "yayasanId": 1,
+#     "yayasanName": "Yayasan Pendidikan ABC",
+#     "institutionId": 2,
+#     "institutionName": "SMA ABC Jakarta",
+#     "invoiceNumber": null,
+#     "accountNumber": "ACC-BIL-001",
+#     "accountName": "BILLING Account",
+#     "amount": 5000000.00,
+#     "requesterUserId": 10,
+#     "requesterUserName": "John Doe",
+#     "approverUserId": null,
+#     "approverUserName": null,
+#     "status": "PENDING",
+#     "statusUpdatedAt": "2025-01-15T10:30:00.000Z",
+#     "note": "Request pencairan dana untuk operasional bulan Januari",
+#     "createdAt": "2025-01-15T10:30:00.000Z",
+#     "updatedAt": "2025-01-15T10:30:00.000Z"
+#   }
+# }
+
+###
+
+### @name List Response - Standard Format
+# {
+#   "data": [
+#     {
+#       "id": 1,
+#       "uuid": "550e8400-e29b-41d4-a716-446655440000",
+#       "status": "PENDING",
+#       "amount": 5000000.00,
+#       "requesterUserName": "John Doe",
+#       "createdAt": "2025-01-15T10:30:00.000Z"
+#     }
+#   ],
+#   "total": 15,
+#   "page": 0,
+#   "size": 10,
+#   "totalPages": 2,
+#   "hasNext": true,
+#   "hasPrevious": false
+# }
+
+###
+
+### @name Approve Response
+# {
+#   "success": true,
+#   "message": "Withdrawal request approved successfully",
+#   "timestamp": "2025-01-15T11:00:00.000Z",
+#   "data": {
+#     "id": 1,
+#     "status": "APPROVED",
+#     "approverUserId": 20,
+#     "approverUserName": "Jane Smith",
+#     "statusUpdatedAt": "2025-01-15T11:00:00.000Z",
+#     "note": "Request pencairan dana untuk operasional bulan Januari\n[Approver note]: Request disetujui sesuai prosedur"
+#   }
+# }
+
+###
+
+### ============================================================================
+### ERROR RESPONSES
+### ============================================================================
+
+### @name Error: Invalid Account
+# {
+#   "success": false,
+#   "message": "Account not found",
+#   "timestamp": "2025-01-15T10:35:00.000Z",
+#   "errorCode": "RESOURCE_NOT_FOUND",
+#   "statusCode": 404
+# }
+
+###
+
+### @name Error: Permission Denied
+# {
+#   "success": false,
+#   "message": "You can only update your own requests",
+#   "timestamp": "2025-01-15T10:36:00.000Z",
+#   "errorCode": "PERMISSION_DENIED",
+#   "statusCode": 403
+# }
+
+###
+
+### @name Error: Invalid Status
+# {
+#   "success": false,
+#   "message": "Only PENDING requests can be updated",
+#   "timestamp": "2025-01-15T10:37:00.000Z",
+#   "errorCode": "INVALID_INPUT",
+#   "statusCode": 400
+# }
+
+###
+
+### @name Error: Invalid Action
+# {
+#   "success": false,
+#   "message": "Action must be APPROVE or REJECT",
+#   "timestamp": "2025-01-15T10:38:00.000Z",
+#   "errorCode": "INVALID_INPUT",
+#   "statusCode": 400
+# }
+
+###
+
+### @name Error: Invalid OTP
+# {
+#   "success": false,
+#   "message": "Invalid or expired OTP code",
+#   "timestamp": "2025-01-15T10:39:00.000Z",
+#   "errorCode": "INVALID_INPUT",
+#   "statusCode": 400
+# }
+
+###
+
+### ============================================================================
+### NOTES & WORKFLOW
+### ============================================================================
+
+# Workflow Pengajuan Withdrawal:
+#
+# 0. REQUEST OTP (sebelum create)
+#    - User request OTP via authentication endpoint
+#    - OTP dikirim ke nomor telephone user yang terdaftar
+#    - OTP valid 5 menit, max 5 kali percobaan
+#    - OTP code: "1234" (untuk development)
+#
+# 1. CREATE (POST /)
+#    - User dari yayasan/institusi membuat request
+#    - Wajib validasi OTP code (otpCode field)
+#    - Status: PENDING
+#    - Hanya bisa request dari account milik institusi sendiri
+#
+# 2. UPDATE (PUT /{id})
+#    - Hanya requester yang bisa update
+#    - Hanya request dengan status PENDING
+#    - Bisa update: accountNumber, amount, note
+#
+# 3. APPROVE/REJECT (POST /{id}/approve)
+#    - Owner/admin approve atau reject request
+#    - Action: APPROVE → status APPROVED
+#    - Action: REJECT → status REJECTED
+#    - Note approver ditambahkan ke existing note
+#
+# 4. CANCEL (POST /{id}/cancel)
+#    - Hanya requester yang bisa cancel
+#    - Hanya request dengan status PENDING
+#    - Status: CANCELLED
+#
+# 5. DELETE (DELETE /{id})
+#    - Hanya requester yang bisa delete
+#    - Hanya request PENDING atau CANCELLED
+#    - Soft delete (deletedAt set)
+#
+# Status Flow:
+# PENDING → APPROVED (via approve)
+# PENDING → REJECTED (via approve)
+# PENDING → CANCELLED (via cancel)
+#
+# Permission Matrix:
+# - CREATE: Semua user dengan yayasan/institusi
+# - READ: User hanya bisa lihat request institusi/yayasan sendiri
+# - UPDATE: Hanya requester, hanya status PENDING
+# - APPROVE/REJECT: Owner/admin (logic bisa ditambahkan)
+# - CANCEL: Hanya requester, hanya status PENDING
+# - DELETE: Hanya requester, hanya PENDING/CANCELLED
+#
+# Validation Rules:
+# - otpCode: must be valid and not expired (validate against user's telephone)
+# - accountNumber: must exist dan harus milik institusi user
+# - amount: must be positive
+# - action: must be APPROVE or REJECT
+# - status transition: sesuai workflow di atas
+#
+# OTP Validation:
+# - OTP dikirim ke nomor telephone user yang terdaftar
+# - OTP code harus valid dan belum expired (5 menit)
+# - Maksimal 5 kali percobaan salah
+# - Setelah berhasil validasi, OTP otomatis di-soft delete

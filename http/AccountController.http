@@ -1,0 +1,14 @@
+@host = http://localhost:8081
+@token = your_jwt_token_here
+
+### Get account (requires INSTITUTION role)
+GET {{@host}}/api/account
+Authorization: Bearer {{@token}}
+
+### Get admin info (requires ADMIN role)
+GET {{@host}}/api/account/account/admin?param=foo
+Authorization: Bearer {{@token}}
+
+### Check account (throws 403 if param missing)
+GET {{@host}}/api/account/account/check?param=test
+Authorization: Bearer {{@token}}

@@ -1,0 +1,319 @@
+### Transaction Journals - HTTP collection for VS Code REST Client
+# Replace {{baseUrl}} with `http://localhost:8081` (or your server URL)
+# Replace {{token}} with a valid JWT if you test authenticated endpoints
+
+### Create Transaction Journal
+POST {{baseUrl}}/api/transaction-journals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "yayasanId": 1,
+  "institutionId": 1,
+  "referenceNumber": "REF-2025-001",
+  "invoiceNumber": "INV-2025-001",
+  "debitAccountId": 1,
+  "creditAccountId": 2,
+  "amount": 100000,
+  "feeAmount": 2000,
+  "providerFee": 500,
+  "transactionType": "TRF_INT",
+  "description": "Test transaction",
+  "status": "SUCCESS",
+  "systemSource": "CORE"
+}
+
+###
+
+### Get All Transaction Journals (List without pagination)
+GET {{baseUrl}}/api/transaction-journals
+Authorization: Bearer {{token}}
+
+###
+
+### Get Transaction Journal by ID
+GET {{baseUrl}}/api/transaction-journals/1
+Authorization: Bearer {{token}}
+
+###
+
+### Get Transaction Journal by Reference Number
+GET {{baseUrl}}/api/transaction-journals/reference/REF-2025-001
+Authorization: Bearer {{token}}
+
+###
+
+### Update Transaction Journal
+PUT {{baseUrl}}/api/transaction-journals/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "yayasanId": 1,
+  "institutionId": 1,
+  "referenceNumber": "REF-2025-001-UPDATED",
+  "invoiceNumber": "INV-2025-001",
+  "debitAccountId": 1,
+  "creditAccountId": 2,
+  "amount": 150000,
+  "feeAmount": 3000,
+  "providerFee": 750,
+  "transactionType": "TRF_INT",
+  "description": "Updated test transaction",
+  "status": "SUCCESS",
+  "systemSource": "CORE"
+}
+
+###
+
+### Delete Transaction Journal
+DELETE {{baseUrl}}/api/transaction-journals/1
+Authorization: Bearer {{token}}
+
+###
+
+### ======================================
+### CREDIT JOURNALS ENDPOINTS
+### ======================================
+
+### Get All Credit Journals (Standard Format)
+GET {{baseUrl}}/api/transaction-journals/credit/all?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit Journals (jQuery DataTable Format)
+GET {{baseUrl}}/api/transaction-journals/credit/all?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+###
+
+### Get All Credit Journals (Ant Design Table Format)
+GET {{baseUrl}}/api/transaction-journals/credit/all?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+###
+
+### Get All Credit Journals - With Account Number Filter
+GET {{baseUrl}}/api/transaction-journals/credit/all?page=0&size=20&accountNumber=ACC
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit Journals - With Account Type Filter
+GET {{baseUrl}}/api/transaction-journals/credit/all?page=0&size=20&accountType=ASSET
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit Journals - With Account Level Filter
+GET {{baseUrl}}/api/transaction-journals/credit/all?page=0&size=20&accountLevel=MAIN
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit Journals - With All Account Filters
+GET {{baseUrl}}/api/transaction-journals/credit/all?page=0&size=20&accountNumber=ACC&accountType=ASSET&accountLevel=MAIN
+Authorization: Bearer {{token}}
+
+###
+
+### ======================================
+### DEBIT JOURNALS ENDPOINTS
+### ======================================
+
+### Get All Debit Journals (Standard Format)
+GET {{baseUrl}}/api/transaction-journals/debit/all?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Debit Journals (jQuery DataTable Format)
+GET {{baseUrl}}/api/transaction-journals/debit/all?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+###
+
+### Get All Debit Journals (Ant Design Table Format)
+GET {{baseUrl}}/api/transaction-journals/debit/all?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+###
+
+### Get All Debit Journals - With Account Number Filter
+GET {{baseUrl}}/api/transaction-journals/debit/all?page=0&size=20&accountNumber=ACC
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Debit Journals - With Account Type Filter
+GET {{baseUrl}}/api/transaction-journals/debit/all?page=0&size=20&accountType=LIABILITY
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Debit Journals - With Account Level Filter
+GET {{baseUrl}}/api/transaction-journals/debit/all?page=0&size=20&accountLevel=MAIN
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Debit Journals - With All Account Filters
+GET {{baseUrl}}/api/transaction-journals/debit/all?page=0&size=20&accountNumber=ACC&accountType=LIABILITY&accountLevel=MAIN
+Authorization: Bearer {{token}}
+
+###
+
+### ======================================
+### CREDIT AND DEBIT JOURNALS ENDPOINTS
+### ======================================
+
+### Get All Credit and Debit Journals (Standard Format)
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals (jQuery DataTable Format)
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+###
+
+### Get All Credit and Debit Journals (Ant Design Table Format)
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+###
+
+### Get All Credit and Debit Journals - Filter by Credit Side Only
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&sideType=credit
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals - Filter by Debit Side Only
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&sideType=debit
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals - With Account Number Filter
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&accountNumber=ACC
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals - With Account Type Filter
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&accountType=ASSET
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals - With Account Level Filter
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&accountLevel=MAIN
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals - With All Account Filters
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&accountNumber=ACC&accountType=ASSET&accountLevel=MAIN
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals - Filter by Credit Side and Account
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&sideType=credit&accountNumber=ACC&accountType=ASSET&accountLevel=MAIN
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals - Filter by Debit Side and Account
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&sideType=debit&accountNumber=ACC&accountType=LIABILITY&accountLevel=MAIN
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals - Custom Sorting (ASC)
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=20&sortBy=id&sortDirection=ASC
+Authorization: Bearer {{token}}
+
+###
+
+### Get All Credit and Debit Journals - Large Page Size
+GET {{baseUrl}}/api/transaction-journals/credit-debit/all?page=0&size=100
+Authorization: Bearer {{token}}
+
+###
+
+### ======================================
+### NOTES AND DOCUMENTATION
+### ======================================
+
+# API Documentation:
+# - All endpoints support pagination with page (0-indexed) and size parameters
+# - Default sortBy: "id", default sortDirection: "DESC"
+# - Available sort fields: id, timestampTxn, referenceNumber, invoiceNumber, amount, etc.
+# - Sort directions: ASC or DESC
+#
+# Response Formats (via format header):
+# - standard (default): PageResponse with clean structure
+# - jquery-datatable: JQueryDataTableResponse with draw, recordsTotal, recordsFiltered
+# - ant-table: AntDesignTableResponse with success, total, current, pageSize
+#
+# Account Filter Parameters:
+# - accountNumber: Case-insensitive LIKE search (partial matching)
+# - accountType: EXACT match - values: ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE
+# - accountLevel: EXACT match - values: MAIN, SUB, DETAIL
+# - sideType: Filter by transaction side - values: credit, debit (only for credit-debit endpoint)
+#
+# Credit Journals Endpoint (/credit/all):
+# - Returns journals where credit account matches the filters
+# - Useful for tracking incoming funds/credits
+#
+# Debit Journals Endpoint (/debit/all):
+# - Returns journals where debit account matches the filters
+# - Useful for tracking outgoing funds/debits
+#
+# Credit and Debit Journals Endpoint (/credit-debit/all):
+# - Returns journals where either credit OR debit account matches the filters
+# - Can be further filtered by sideType parameter
+# - Most flexible endpoint for comprehensive journal queries
+#
+# Authorization:
+# - All endpoints require Bearer token authentication
+# - Token should be obtained from login endpoint
+#
+# Example Response (Standard Format):
+# {
+#   "data": [...],
+#   "total": 100,
+#   "page": 0,
+#   "size": 20,
+#   "totalPages": 5,
+#   "hasNext": true,
+#   "hasPrevious": false
+# }
+#
+# Example Response (jQuery DataTable Format):
+# {
+#   "draw": 1,
+#   "recordsTotal": 100,
+#   "recordsFiltered": 100,
+#   "data": [...]
+# }
+#
+# Example Response (Ant Design Format):
+# {
+#   "data": [...],
+#   "success": true,
+#   "total": 100,
+#   "current": 1,
+#   "pageSize": 20
+# }

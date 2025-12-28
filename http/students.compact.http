@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:8080
+@token = <YOUR_JWT_TOKEN>
+
+###
+# Compact students list (non-paginated) — requires `academicYearId`
+GET {{baseUrl}}/api/students/compact?academicYearId=2025
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# Example: compact list (different year)
+GET {{baseUrl}}/api/students/compact?academicYearId=2024
+Authorization: Bearer {{token}}
+Accept: application/json

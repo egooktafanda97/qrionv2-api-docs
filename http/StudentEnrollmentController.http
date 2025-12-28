@@ -1,0 +1,210 @@
+### Student Enrollment API Testing
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0ZGM1Yjk1OS1hZmJiLTRlZGItOGExMy1hOTQxZGI5MmJjMjQiLCJpYXQiOjE3NjM4NjQxNDIsImV4cCI6MTc2Mzk1MDU0Mn0.8BNhbclI1gb4KJnga_9wwbrT2Sps-k1sgsS3W1gM9jI
+
+###
+### STUDENT ENROLLMENT CRUD ENDPOINTS
+###
+
+### 1. List All Student Enrollments (Paginated - Standard Format)
+GET {{host}}/api/student-enrollments?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 2. List All Student Enrollments (jQuery DataTable Format)
+GET {{host}}/api/student-enrollments?page=0&size=10&sortBy=enrolledAt&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+Content-Type: {{contentType}}
+
+### 3. List All Student Enrollments (Ant Design Table Format)
+GET {{host}}/api/student-enrollments?page=0&size=10&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+Content-Type: {{contentType}}
+
+### 4. Get Student Enrollment by ID
+GET {{host}}/api/student-enrollments/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 5. Get All Enrollments for Specific Student
+GET {{host}}/api/student-enrollments/student/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 6. Get Enrollment by Student ID and Academic Year ID
+GET {{host}}/api/student-enrollments/student/1/academic-year/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### 7. Create New Student Enrollment - Full Data
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 1,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "statusId": 1
+}
+
+### 8. Create New Student Enrollment - Minimal (No Sub Class)
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 2,
+  "academicYearId": 1,
+  "classId": 2,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "statusId": 1
+}
+
+### 9. Update Student Enrollment - Change Class (Will Record Transfer History)
+PUT {{host}}/api/student-enrollments/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "classId": 3,
+  "subClassId": 2
+}
+
+### 10. Update Student Enrollment - Change Status Only
+PUT {{host}}/api/student-enrollments/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "statusId": 2
+}
+
+### 11. Update Student Enrollment - Full Update
+PUT {{host}}/api/student-enrollments/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 1,
+  "classId": 3,
+  "subClassId": 3,
+  "enrolledAt": "2025-07-01T09:00:00",
+  "statusId": 1
+}
+
+### 12. Delete Student Enrollment
+DELETE {{host}}/api/student-enrollments/1
+Authorization: Bearer {{token}}
+
+###
+### ERROR HANDLING TEST CASES
+###
+
+### Test: Create with Non-Existent Student
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 99999,
+  "academicYearId": 1,
+  "classId": 1,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "statusId": 1
+}
+
+### Test: Create with Non-Existent Academic Year
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 99999,
+  "classId": 1,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "statusId": 1
+}
+
+### Test: Create with Non-Existent Class
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 1,
+  "classId": 99999,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "statusId": 1
+}
+
+### Test: Create Duplicate Enrollment (Same Student & Academic Year)
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 1,
+  "classId": 1,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "statusId": 1
+}
+
+### Test: Create with Missing Required Fields
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1
+}
+
+### Test: Create with Invalid Status ID (Less than 1)
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "academicYearId": 1,
+  "classId": 1,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "statusId": 0
+}
+
+### Test: Get Non-Existent Enrollment
+GET {{host}}/api/student-enrollments/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### Test: Update Non-Existent Enrollment
+PUT {{host}}/api/student-enrollments/99999
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "statusId": 2
+}
+
+### Test: Delete Non-Existent Enrollment
+DELETE {{host}}/api/student-enrollments/99999
+Authorization: Bearer {{token}}
+
+###
+### NOTES
+###
+# 1. Semua operasi difilter berdasarkan yayasan dan institusi user yang sedang login
+# 2. Update class akan otomatis mencatat riwayat mutasi ke StudentTransferHistory
+# 3. Tidak bisa membuat enrollment duplikat (siswa yang sama pada tahun ajaran yang sama)
+# 4. StatusId minimal 1
+# 5. SubClassId bersifat opsional
+# 6. EnrolledAt jika tidak diisi akan menggunakan waktu sekarang

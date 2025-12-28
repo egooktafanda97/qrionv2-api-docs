@@ -1,0 +1,37 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = {{token}}
+
+### List transaction payments
+GET {{host}}/api/transaction-payments
+Authorization: Bearer {{token}}
+
+### Create transaction payment
+POST {{host}}/api/transaction-payments
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "transactionId": 1,
+  "vaNumber": "1234567890",
+  "invoiceNumber": "INV-2025-0001",
+  "expiredAt": "2025-12-31T23:59:59",
+  "status": "PENDING"
+}
+
+### Update transaction payment
+PUT {{host}}/api/transaction-payments/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "transactionId": 1,
+  "vaNumber": "1234567890",
+  "invoiceNumber": "INV-2025-0001",
+  "expiredAt": "2025-12-31T23:59:59",
+  "status": "PAID"
+}
+
+### Delete transaction payment
+DELETE {{host}}/api/transaction-payments/1
+Authorization: Bearer {{token}}

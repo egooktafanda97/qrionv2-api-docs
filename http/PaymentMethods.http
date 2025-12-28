@@ -1,0 +1,37 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = {{token}}
+
+### List payment methods
+GET {{host}}/api/payment-methods
+Authorization: Bearer {{token}}
+
+### Get payment method by id
+GET {{host}}/api/payment-methods/1
+Authorization: Bearer {{token}}
+
+### Create payment method
+POST {{host}}/api/payment-methods
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "BNI Virtual Account",
+  "channelCode": "VA",
+  "provider": "BNI"
+}
+
+### Update payment method
+PUT {{host}}/api/payment-methods/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "BNI VA - Updated",
+  "channelCode": "VA",
+  "provider": "BNI"
+}
+
+### Delete payment method
+DELETE {{host}}/api/payment-methods/1
+Authorization: Bearer {{token}}

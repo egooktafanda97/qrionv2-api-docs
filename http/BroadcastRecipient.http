@@ -1,0 +1,551 @@
+### BroadcastRecipient - HTTP collection for Broadcast Recipient Management
+# Replace {{baseUrl}} with `http://localhost:8081` (or your server URL)
+# Replace {{token}} with a valid JWT token
+# CRITICAL: Use "students" field (NOT "recipients") for all bulk-* endpoints
+
+# ============================================================================
+# BROADCAST RECIPIENT - SEND NOW
+# ============================================================================
+
+### Send Broadcast Now (Single Recipient)
+# Sends broadcast immediately to one recipient
+POST {{baseUrl}}/api/broadcast-recipients/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890",
+  "recipientGroup": "class-10a",
+  "messageItem": {
+    "nama_siswa": "Budi Santoso",
+    "siswa_kelas": "10A",
+    "nominal_tagihan": "Rp 1.500.000",
+    "nama_institut": "SMA Negeri 1"
+  }
+}
+
+###
+
+### Send Broadcast Now (Bulk by Student IDs)
+# IMPORTANT: Use "students" array (NOT "recipients")
+# Endpoint: /api/broadcast-recipients/bulk-id/send-now
+POST {{baseUrl}}/api/broadcast-recipients/bulk-id/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "recipientGroup": "class-10a",
+  "students": [
+    {
+      "studentId": 12345,
+      "studentName": "Budi Santoso",
+      "whatsappNumber": "6281234567890"
+    },
+    {
+      "studentId": 12346,
+      "studentName": "Ani Wijaya",
+      "whatsappNumber": "6281234567891"
+    },
+    {
+      "studentId": 12347,
+      "studentName": "Rudi Hartono",
+      "whatsappNumber": "6281234567892"
+    }
+  ]
+}
+
+###
+
+### Send Broadcast Now (Bulk with Message Personalization)
+# Bulk send with per-recipient message personalization
+# Endpoint: /api/broadcast-recipients/bulk/send-now
+# Template placeholders: [key] or {{key}} will be replaced from messageItem
+# IMPORTANT: Use standard template field keys from TemplateFieldBootstrap:
+# - nama_siswa (student name)
+# - siswa_kelas (student class)
+# - nama_institut (institution name)
+# - alamat_siswa (student address)
+# - nominal_tagihan (billing amount)
+# - tanggal_tempo (due date)
+# - nama_wali (parent/guardian name)
+# - bulan_penagihan (billing month)
+# - jenis_tagihan (billing type/year)
+# - tanggal_penagihan (billing creation date)
+POST {{baseUrl}}/api/broadcast-recipients/bulk/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 2,
+  "recipientGroup": "class-10b",
+  "students": [
+    {
+      "studentId": 12348,
+      "studentName": "Rudi Hartono",
+      "whatsappNumber": "6281234567892",
+      "messageItem": {
+        "nama_siswa": "Rudi Hartono",
+        "siswa_kelas": "10B",
+        "nama_institut": "SMA Negeri 2",
+        "nominal_tagihan": "Rp 2.000.000",
+        "tanggal_tempo": "2025-01-15",
+        "bulan_penagihan": "Januari 2025"
+      }
+    },
+    {
+      "studentId": 12349,
+      "studentName": "Siti Nurhaliza",
+      "whatsappNumber": "6281234567893",
+      "messageItem": {
+        "nama_siswa": "Siti Nurhaliza",
+        "siswa_kelas": "10B",
+        "nama_institut": "SMA Negeri 2",
+        "nominal_tagihan": "Rp 2.000.000",
+        "tanggal_tempo": "2025-01-15",
+        "bulan_penagihan": "Januari 2025"
+      }
+    },
+    {
+      "studentId": 12350,
+      "studentName": "Bambang Supono",
+      "whatsappNumber": "6281234567894",
+      "messageItem": {
+        "nama_siswa": "Bambang Supono",
+        "siswa_kelas": "10B",
+        "nama_institut": "SMA Negeri 2",
+        "nominal_tagihan": "Rp 2.000.000",
+        "tanggal_tempo": "2025-01-15",
+        "bulan_penagihan": "Januari 2025"
+      }
+    }
+  ]
+}
+
+###
+
+# ============================================================================
+# BROADCAST RECIPIENT - SCHEDULED DELIVERY
+# ============================================================================
+
+### Schedule Broadcast (Single Recipient)
+# Schedules broadcast to be sent at specific date/time
+# Format: 2025-12-25T09:00:00 (ISO 8601)
+POST {{baseUrl}}/api/broadcast-recipients/schedule?scheduleDate=2025-12-25T09:00:00
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890",
+  "recipientGroup": "class-10a",
+  "messageItem": {
+    "nama_siswa": "Budi Santoso",
+    "siswa_kelas": "10A",
+    "nama_institut": "SMA Negeri 1",
+    "bulan_penagihan": "Desember 2025"
+  }
+}
+
+###
+
+### Schedule Broadcast (Bulk by Student IDs)
+# Schedules broadcast for multiple recipients using student ID list
+# Endpoint: /api/broadcast-recipients/bulk-id/schedule
+POST {{baseUrl}}/api/broadcast-recipients/bulk-id/schedule?scheduleDate=2025-12-25T10:00:00
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "recipientGroup": "class-10a",
+  "students": [
+    {
+      "studentId": 12345,
+      "studentName": "Budi Santoso",
+      "whatsappNumber": "6281234567890"
+    },
+    {
+      "studentId": 12346,
+      "studentName": "Ani Wijaya",
+      "whatsappNumber": "6281234567891"
+    }
+  ]
+}
+
+###
+
+### Schedule Broadcast (Bulk with Personalization)
+# Schedules broadcast with per-recipient message personalization
+# Endpoint: /api/broadcast-recipients/bulk/schedule
+POST {{baseUrl}}/api/broadcast-recipients/bulk/schedule?scheduleDate=2026-01-01T08:00:00
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 3,
+  "recipientGroup": "class-11",
+  "students": [
+    {
+      "studentId": 12351,
+      "studentName": "Joko Supriyanto",
+      "whatsappNumber": "6281234567895",
+      "messageItem": {
+        "nama_siswa": "Joko Supriyanto",
+        "siswa_kelas": "11A",
+        "nama_institut": "SMA Negeri 1",
+        "bulan_penagihan": "Januari 2026"
+      }
+    },
+    {
+      "studentId": 12352,
+      "studentName": "Maya Kusuma",
+      "whatsappNumber": "6281234567896",
+      "messageItem": {
+        "nama_siswa": "Maya Kusuma",
+        "siswa_kelas": "11A",
+        "nama_institut": "SMA Negeri 1",
+        "bulan_penagihan": "Januari 2026"
+      }
+    }
+  ]
+}
+
+###
+
+# ============================================================================
+# BROADCAST RECIPIENT - MONTHLY DELIVERY
+# ============================================================================
+
+### Monthly Broadcast (Single Recipient)
+# Schedules broadcast to be sent monthly on specific day (e.g., 1st of every month)
+# Parameter: dayOfMonth (1-28)
+POST {{baseUrl}}/api/broadcast-recipients/monthly?dayOfMonth=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 4,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890",
+  "recipientGroup": "class-10a",
+  "messageItem": {
+    "nama_siswa": "Budi Santoso",
+    "siswa_kelas": "10A",
+    "nama_institut": "SMA Negeri 1",
+    "nominal_tagihan": "Rp 1.500.000",
+    "tanggal_tempo": "2025-01-05",
+    "bulan_penagihan": "Januari 2025"
+  }
+}
+
+###
+
+### Monthly Broadcast (Bulk by Student IDs)
+# Schedules monthly broadcast for multiple recipients using student ID list
+# Sends every month on dayOfMonth (e.g., 5th of each month)
+# Endpoint: /api/broadcast-recipients/bulk-id/monthly
+POST {{baseUrl}}/api/broadcast-recipients/bulk-id/monthly?dayOfMonth=5
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 5,
+  "recipientGroup": "class-12",
+  "students": [
+    {
+      "studentId": 12353,
+      "studentName": "Eka Wulandari",
+      "whatsappNumber": "6281234567897"
+    },
+    {
+      "studentId": 12354,
+      "studentName": "Dani Hermawan",
+      "whatsappNumber": "6281234567898"
+    },
+    {
+      "studentId": 12355,
+      "studentName": "Fitrah Aziz",
+      "whatsappNumber": "6281234567899"
+    }
+  ]
+}
+
+###
+
+### Monthly Broadcast (Bulk with Personalization)
+# Monthly broadcast with per-recipient personalization
+# Endpoint: /api/broadcast-recipients/bulk/monthly
+# Sends monthly on dayOfMonth with personalized messages
+POST {{baseUrl}}/api/broadcast-recipients/bulk/monthly?dayOfMonth=15
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 6,
+  "recipientGroup": "monthly-billing",
+  "students": [
+    {
+      "studentId": 12356,
+      "studentName": "Suprianto",
+      "whatsappNumber": "62812345678910",
+      "messageItem": {
+        "nama_siswa": "Suprianto",
+        "siswa_kelas": "10A",
+        "nama_institut": "SMA Negeri 1",
+        "nominal_tagihan": "Rp 1.500.000",
+        "tanggal_tempo": "2025-01-25",
+        "bulan_penagihan": "Januari 2025"
+      }
+    },
+    {
+      "studentId": 12357,
+      "studentName": "Wulan Sari",
+      "whatsappNumber": "62812345678911",
+      "messageItem": {
+        "nama_siswa": "Wulan Sari",
+        "siswa_kelas": "10B",
+        "nama_institut": "SMA Negeri 1",
+        "nominal_tagihan": "Rp 2.000.000",
+        "tanggal_tempo": "2025-01-25",
+        "bulan_penagihan": "Januari 2025"
+      }
+    }
+  ]
+}
+
+###
+
+# ============================================================================
+# BROADCAST RECIPIENT - DETAILED EXAMPLES WITH MESSAGE TEMPLATES
+# ============================================================================
+
+### Example: Personalized Student Report Card Notification
+# Sends personalized report card results to each student
+# Template in Broadcast: "Halo [nama_siswa], nilai akademik Anda kelas [siswa_kelas] di [nama_institut]"
+POST {{baseUrl}}/api/broadcast-recipients/bulk/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 7,
+  "recipientGroup": "class-10a-report-card",
+  "students": [
+    {
+      "studentId": 12358,
+      "studentName": "Ahmad Rifai",
+      "whatsappNumber": "62812345678912",
+      "messageItem": {
+        "nama_siswa": "Ahmad Rifai",
+        "siswa_kelas": "10A",
+        "nama_institut": "SMA Negeri 1",
+        "nominal_tagihan": "Rp 1.500.000"
+      }
+    },
+    {
+      "studentId": 12359,
+      "studentName": "Bella Putri",
+      "whatsappNumber": "62812345678913",
+      "messageItem": {
+        "nama_siswa": "Bella Putri",
+        "siswa_kelas": "10A",
+        "nama_institut": "SMA Negeri 1",
+        "nominal_tagihan": "Rp 1.500.000"
+      }
+    },
+    {
+      "studentId": 12360,
+      "studentName": "Citra Dewi",
+      "whatsappNumber": "62812345678914",
+      "messageItem": {
+        "nama_siswa": "Citra Dewi",
+        "siswa_kelas": "10A",
+        "nama_institut": "SMA Negeri 1",
+        "nominal_tagihan": "Rp 1.500.000"
+      }
+    }
+  ]
+}
+
+###
+
+### Example: Scholarship Status Notification
+# Sends personalized scholarship approval/rejection messages
+# Template: "[nama_siswa] dari [nama_institut], status beasiswa untuk bulan [bulan_penagihan]"
+POST {{baseUrl}}/api/broadcast-recipients/bulk/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 8,
+  "recipientGroup": "scholarship-notification",
+  "students": [
+    {
+      "studentId": 12361,
+      "studentName": "Hendra Gunawan",
+      "whatsappNumber": "62812345678915",
+      "messageItem": {
+        "nama_siswa": "Hendra Gunawan",
+        "siswa_kelas": "11A",
+        "nama_institut": "SMA Negeri 1",
+        "bulan_penagihan": "Januari 2025",
+        "nominal_tagihan": "Rp 0"
+      }
+    },
+    {
+      "studentId": 12362,
+      "studentName": "Intan Permata",
+      "whatsappNumber": "62812345678916",
+      "messageItem": {
+        "nama_siswa": "Intan Permata",
+        "siswa_kelas": "11A",
+        "nama_institut": "SMA Negeri 1",
+        "bulan_penagihan": "Januari 2025",
+        "nominal_tagihan": "Rp 1.000.000"
+      }
+    }
+  ]
+}
+
+###
+
+### Example: Event Attendance Reminder
+# Sends personalized event attendance reminders
+# Template: "[nama_siswa] dari kelas [siswa_kelas], reminder untuk [nama_institut]"
+POST {{baseUrl}}/api/broadcast-recipients/bulk/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 9,
+  "recipientGroup": "class-10a-event",
+  "students": [
+    {
+      "studentId": 12363,
+      "studentName": "Gregorius Agus",
+      "whatsappNumber": "62812345678917",
+      "messageItem": {
+        "nama_siswa": "Gregorius Agus",
+        "siswa_kelas": "10A",
+        "nama_institut": "SMA Negeri 1",
+        "bulan_penagihan": "Januari 2025"
+      }
+    },
+    {
+      "studentId": 12364,
+      "studentName": "Hermina Sari",
+      "whatsappNumber": "62812345678918",
+      "messageItem": {
+        "nama_siswa": "Hermina Sari",
+        "siswa_kelas": "10A",
+        "nama_institut": "SMA Negeri 1",
+        "bulan_penagihan": "Januari 2025"
+      }
+    }
+  ]
+}
+
+###
+
+### Example: Parent Enrollment Confirmation
+# Sends personalized enrollment confirmation to parents
+# Template: "[nama_siswa] telah terdaftar di [nama_institut] untuk kelas [siswa_kelas]"
+POST {{baseUrl}}/api/broadcast-recipients/bulk/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 10,
+  "recipientGroup": "enrollment-confirmation",
+  "students": [
+    {
+      "studentId": 12365,
+      "studentName": "Ivan Setiawan",
+      "whatsappNumber": "62812345678919",
+      "messageItem": {
+        "nama_siswa": "Ivan Setiawan",
+        "nama_wali": "Bapak Setiawan",
+        "siswa_kelas": "10A",
+        "nama_institut": "SMA Negeri 1",
+        "bulan_penagihan": "Januari 2025"
+      }
+    }
+  ]
+}
+
+###
+
+# ============================================================================
+# PAYLOAD STRUCTURE REFERENCE
+# ============================================================================
+
+# For /api/broadcast-recipients/send-now (Single)
+# {
+#   "broadcastId": Long (required),
+#   "studentId": Long (required),
+#   "studentName": String (required),
+#   "whatsappNumber": String (required),
+#   "recipientGroup": String (optional),
+#   "messageItem": Object (optional - for personalization)
+# }
+
+# For /api/broadcast-recipients/bulk-id/* (Bulk by IDs - Simple)
+# {
+#   "broadcastId": Long (required),
+#   "recipientGroup": String (optional),
+#   "students": [
+#     {
+#       "studentId": Long (required),
+#       "studentName": String (required),
+#       "whatsappNumber": String (required)
+#     }
+#   ]
+# }
+
+# For /api/broadcast-recipients/bulk/* (Bulk with Personalization)
+# {
+#   "broadcastId": Long (required),
+#   "recipientGroup": String (optional),
+#   "students": [
+#     {
+#       "studentId": Long (required),
+#       "studentName": String (required),
+#       "whatsappNumber": String (required),
+#       "messageItem": Object (optional - for personalization with {{key}})
+#     }
+#   ]
+# }
+
+# ============================================================================
+# IMPORTANT NOTES
+# ============================================================================
+
+# 1. FIELD NAMES:
+#    - Use "students" (NOT "recipients") in request JSON
+#    - This is a critical requirement for deserialization
+
+# 2. MESSAGE PERSONALIZATION:
+#    - Define placeholder template in Broadcast entity (e.g., "Halo {{name}}")
+#    - Define corresponding values in messageItem: { "name": "Budi" }
+#    - System will replace {{name}} with "Budi" in final message
+
+# 3. TEMPLATE KEY VALIDATION:
+#    - All {{key}} placeholders must have corresponding messageItem values
+#    - Missing keys will not be replaced (template key stays as-is)
+
+# 4. SCHEDULING:
+#    - Use ISO 8601 format for scheduleDate: 2025-12-25T09:00:00
+#    - Use dayOfMonth (1-28) for monthly schedules
+
+# 5. ERROR HANDLING:
+#    - If students list is null or empty: Returns 400 Bad Request with error message
+#    - If broadcastId invalid: Returns 400 Bad Request
+#    - If whatsappNumber format invalid: Returns 400 Bad Request
+
+# ============================================================================

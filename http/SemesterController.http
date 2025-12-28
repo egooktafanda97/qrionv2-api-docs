@@ -1,0 +1,67 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4NjE2NTAyOS1kYjhkLTQ0ZTktOTkwZi0xMjFmZGQ1YThmNDgiLCJpYXQiOjE3NjM4MDE0MjQsImV4cCI6MTc2Mzg4NzgyNH0.SQZQUsDdRkPVtpqI1WxLFTUo252JDZFRpFGgctaRyr4
+
+### List semesters
+GET {{host}}/api/semesters
+Authorization: Bearer {{token}}
+
+### Get semester by id
+GET {{host}}/api/semesters/1
+Authorization: Bearer {{token}}
+
+### Create semester (with academicYearId as INTEGER ID)
+POST {{host}}/api/semesters
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "academicYearId": "3",
+  "name": "GANJIL",
+  "startDate": "2025-07-01",
+  "endDate": "2025-12-31",
+  "status": "ACTIVE"
+}
+
+### Create semester (with academicYearId as NAME)
+POST {{host}}/api/semesters
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "academicYearId": "2024/2025",
+  "name": "GANJIL",
+  "startDate": "2024-07-01",
+  "endDate": "2024-12-31",
+  "status": "ACTIVE"
+}
+
+### Update semester (with academicYearId as INTEGER ID)
+PUT {{host}}/api/semesters/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "academicYearId": "1",
+  "name": "GANJIL",
+  "startDate": "2026-01-01",
+  "endDate": "2026-06-30",
+  "status": "ACTIVE"
+}
+
+### Update semester (with academicYearId as NAME)
+PUT {{host}}/api/semesters/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "academicYearId": "2025/2026",
+  "name": "GENAP",
+  "startDate": "2026-01-01",
+  "endDate": "2026-06-30",
+  "status": "ACTIVE"
+}
+
+### Delete semester
+DELETE {{host}}/api/semesters/1
+Authorization: Bearer {{token}}

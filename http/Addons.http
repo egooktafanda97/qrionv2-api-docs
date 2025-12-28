@@ -1,0 +1,50 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = {{token}}
+
+### List addons
+GET {{host}}/api/addons
+Authorization: Bearer {{token}}
+
+### Get addon by id
+GET {{host}}/api/addons/1
+Authorization: Bearer {{token}}
+
+### Create addon (valid)
+POST {{host}}/api/addons
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Notifikasi ke WA Orang Tua",
+  "code": "WA_NOTIF_PARENT",
+  "price": 5000000.0,
+  "pricingType": "/Tahun"
+}
+
+### Create addon (invalid - missing price)
+POST {{host}}/api/addons
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Integrasi E-Channel",
+  "code": "ECHANNEL_INT",
+  "pricingType": "/Instalasi"
+}
+
+### Update addon
+PUT {{host}}/api/addons/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Notifikasi WA - Updated",
+  "code": "WA_NOTIF_PARENT_V2",
+  "price": 5500000.0,
+  "pricingType": "/Tahun"
+}
+
+### Delete addon
+DELETE {{host}}/api/addons/1
+Authorization: Bearer {{token}}

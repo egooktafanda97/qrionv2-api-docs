@@ -1,0 +1,14 @@
+### Broadcast Dashboard Summary
+GET http://localhost:8081/api/broadcasts/dashboard/summary
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Broadcast Dashboard History (paged, optional search)
+GET http://localhost:8081/api/broadcasts/dashboard/history?search={{search}}&page=0&size=10
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Broadcast Dashboard History - with search example
+GET http://localhost:8081/api/broadcasts/dashboard/history?search=reminder&page=0&size=10
+Authorization: Bearer {{token}}
+Accept: application/json

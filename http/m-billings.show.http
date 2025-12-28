@@ -1,0 +1,20 @@
+@baseUrl = http://localhost:8080
+@token = <YOUR_JWT_TOKEN>
+
+###
+# Master billings - full list (non-paginated show)
+GET {{baseUrl}}/api/m-billings/show
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# Master billings - GENERAL compact list
+GET {{baseUrl}}/api/m-billings/show/general
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# Master billings - MONTHLY compact list (optional query param tahun-ajaran)
+GET {{baseUrl}}/api/m-billings/show/monthly?tahun-ajaran=2025
+Authorization: Bearer {{token}}
+Accept: application/json

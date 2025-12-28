@@ -1,0 +1,8 @@
+### Get Current Authenticated User Profile with Relations
+### Endpoint: GET /api/auth/me
+### Required: Valid JWT token in Authorization header
+GET http://localhost:8081/api/auth/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###

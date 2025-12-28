@@ -1,0 +1,8 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0ZGZhY2M4YS1mNDlkLTQxM2MtYjYxZi00MGExNzQzNWQwYzMiLCJpYXQiOjE3NjM5MjM3NDcsImV4cCI6MTc2NDAxMDE0N30.jSrWi9vBs7jb_OuZwW2DFo0Li8Mu-ulHKS0oLjRtmDQ
+
+
+### Check authentication context
+GET {{host}}/api/debug/billing-scholarships
+Authorization: Bearer {{token}}

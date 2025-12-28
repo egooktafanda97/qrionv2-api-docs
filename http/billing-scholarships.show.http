@@ -1,0 +1,30 @@
+@baseUrl = http://localhost:8080
+@token = <YOUR_JWT_TOKEN>
+
+###
+# Billing scholarship - compact show list (controller exposes /api/billing-scholarships/show)
+GET {{baseUrl}}/api/billing-scholarships/show
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# Billing scholarship - get by id
+GET {{baseUrl}}/api/billing-scholarships/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# Create BillingScholarship (example payload)
+POST {{baseUrl}}/api/billing-scholarships
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "scholarshipId": 10,
+  "mBillingId": 5,
+  "discountType": "PERCENTAGE",
+  "discountValue": 25.0,
+  "maxDiscountAmount": 500000,
+  "months": [1,2,3],
+  "notes": "Beasiswa contoh untuk siswa terpilih"
+}

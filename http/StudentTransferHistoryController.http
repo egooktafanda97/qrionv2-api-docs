@@ -1,0 +1,227 @@
+### Transfer History API Tests
+### Base URL: http://localhost:8080/api/student-enrollments
+
+### Variables
+@host = http://localhost:8080
+@token = eyJhbGciOiJIUzI1NiJ9.your-actual-token-here
+
+### ===========================================
+### STUDENT TRANSFER HISTORY ENDPOINTS
+### ===========================================
+
+### 1. Get All Transfer History with Pagination (Standard Format)
+GET {{host}}/api/student-enrollments/transfer-history?page=0&size=10&sortBy=transferredAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+### 2. Get All Transfer History (jQuery DataTable Format)
+GET {{host}}/api/student-enrollments/transfer-history?page=0&size=10&sortBy=transferredAt&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+### 3. Get All Transfer History (Ant Design Table Format)
+GET {{host}}/api/student-enrollments/transfer-history?page=0&size=10&sortBy=transferredAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+### 4. Get Transfer History by ID
+GET {{host}}/api/student-enrollments/transfer-history/1
+Authorization: Bearer {{token}}
+
+### 5. Get Transfer History by Student ID
+GET {{host}}/api/student-enrollments/transfer-history/student/1
+Authorization: Bearer {{token}}
+
+### 6. Get Transfer History by Academic Year ID
+GET {{host}}/api/student-enrollments/transfer-history/academic-year/1
+Authorization: Bearer {{token}}
+
+### 7. Get Transfer History by Student ID with Pagination (Standard Format)
+GET {{host}}/api/student-enrollments/transfer-history/student/1/paginated?page=0&size=5&sortBy=transferredAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+### 8. Get Transfer History by Student ID with Pagination (jQuery DataTable Format)
+GET {{host}}/api/student-enrollments/transfer-history/student/1/paginated?page=0&size=5&sortBy=transferredAt&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+### 9. Get Transfer History by Student ID with Pagination (Ant Design Table Format)
+GET {{host}}/api/student-enrollments/transfer-history/student/1/paginated?page=0&size=5&sortBy=transferredAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+### ===========================================
+### EXPECTED RESPONSES
+### ===========================================
+
+###
+# Response Format untuk Transfer History:
+# {
+#   "success": true,
+#   "message": "Data riwayat mutasi berhasil ditemukan",
+#   "data": {
+#     "id": 1,
+#     "studentId": 1,
+#     "studentName": "Budi Santoso",
+#     "academicYearId": 1,
+#     "academicYearName": "2025/2026",
+#     "academicSemesterId": 1,
+#     "academicSemesterName": "Ganjil",
+#     "fromClassId": 1,
+#     "fromClassName": "Kelas 1",
+#     "toClassId": 2,
+#     "toClassName": "Kelas 2",
+#     "transferStatus": "MUTASI_KELAS",
+#     "note": "Mutasi dari kelas Kelas 1 ke Kelas 2",
+#     "transferredAt": "2025-11-27T10:00:00",
+#     "createdAt": "2025-11-27T10:00:00",
+#     "updatedAt": "2025-11-27T10:00:00"
+#   },
+#   "errorCode": null,
+#   "status": 200,
+#   "timestamp": "2025-11-27T10:00:00Z",
+#   "path": "/api/student-enrollments/transfer-history/1"
+# }
+
+### ===========================================
+### ERROR HANDLING TEST SCENARIOS
+### ===========================================
+
+### 10. Get Transfer History by Non-Existent ID (Should return 404)
+GET {{host}}/api/student-enrollments/transfer-history/99999
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "success": false,
+#   "message": "Data riwayat mutasi dengan ID 99999 tidak ditemukan",
+#   "data": null,
+#   "errorCode": 3000,
+#   "status": 404
+# }
+
+### 11. Get Transfer History for Non-Existent Student (Should return 404)
+GET {{host}}/api/student-enrollments/transfer-history/student/99999
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "success": false,
+#   "message": "Siswa dengan ID 99999 tidak ditemukan",
+#   "data": null,
+#   "errorCode": 3000,
+#   "status": 404
+# }
+
+### 12. Get Transfer History for Student from Different Yayasan (Should return 403)
+# Note: Use a valid student ID but from different yayasan
+GET {{host}}/api/student-enrollments/transfer-history/student/999
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "success": false,
+#   "message": "Anda tidak memiliki akses ke siswa ini karena berbeda yayasan atau institusi",
+#   "data": null,
+#   "errorCode": 2003,
+#   "status": 403
+# }
+
+### 13. Get Transfer History by Non-Existent Academic Year (Should return 404)
+GET {{host}}/api/student-enrollments/transfer-history/academic-year/99999
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "success": false,
+#   "message": "Tahun ajaran dengan ID 99999 tidak ditemukan",
+#   "data": null,
+#   "errorCode": 3000,
+#   "status": 404
+# }
+
+### ===========================================
+### INTEGRATION TEST SCENARIOS
+### ===========================================
+
+### 14. Create Enrollment then Update Class (Should auto-create transfer history)
+# Step 1: Create enrollment
+POST {{host}}/api/student-enrollments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "academicYearId": 1,
+  "classId": 1,
+  "subClassId": 1,
+  "enrolledAt": "2025-07-01T08:00:00",
+  "statusId": 1
+}
+
+### Step 2: Update class (this should auto-create transfer history)
+PUT {{host}}/api/student-enrollments/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "classId": 2,
+  "subClassId": 2
+}
+
+### Step 3: Check transfer history for this student
+GET {{host}}/api/student-enrollments/transfer-history/student/1
+Authorization: Bearer {{token}}
+
+### Expected: Should see a new transfer history record with:
+# - fromClassId: 1
+# - toClassId: 2
+# - transferStatus: MUTASI_KELAS
+# - note: "Mutasi dari kelas [ClassName1] ke [ClassName2]"
+
+### ===========================================
+### NOTES
+### ===========================================
+
+###
+# IMPORTANT POINTS:
+#
+# 1. AUTOMATIC RECORDING:
+#    - Transfer history is automatically created when updating enrollment's classId
+#    - Recording is done in background (non-blocking)
+#    - Even if recording fails, the enrollment update still succeeds
+#
+# 2. FILTERING:
+#    - All transfer history queries are filtered by yayasan and institution
+#    - Filtering is done through the student entity relationship
+#    - Users can only see transfer history for students in their institution
+#
+# 3. RESPONSE FORMAT:
+#    - Standard format: PageResponse with data, total, page, size, etc.
+#    - jQuery DataTable format: draw, recordsTotal, recordsFiltered, data
+#    - Ant Design format: data, success, total, current, pageSize
+#
+# 4. TRANSFER STATUS:
+#    - MUTASI_KELAS: Class transfer/mutation
+#    - Other status values may be added in the future
+#
+# 5. RELATED ENTITIES:
+#    - Student: The student who was transferred
+#    - AcademicYear: The academic year when transfer occurred
+#    - Semester: The semester when transfer occurred
+#    - SchoolClass: From and to classes
+#
+# 6. USE CASES:
+#    - View all class transfers in the institution
+#    - View transfer history for specific student
+#    - View all transfers in specific academic year
+#    - Generate reports on student movements
+#    - Audit trail for class changes
+#
+# 7. SORTING:
+#    - Default sort: transferredAt DESC (newest first)
+#    - Other sortable fields: id, studentId, academicYearId, fromClassId, toClassId
+#
+# 8. PAGINATION:
+#    - Default: page=0, size=10
+#    - Can be customized via query parameters
+#    - Supports multiple response formats for different frontend frameworks

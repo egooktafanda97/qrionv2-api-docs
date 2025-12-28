@@ -1,0 +1,54 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0ZGM1Yjk1OS1hZmJiLTRlZGItOGExMy1hOTQxZGI5MmJjMjQiLCJpYXQiOjE3NjM4NjQxNDIsImV4cCI6MTc2Mzk1MDU0Mn0.8BNhbclI1gb4KJnga_9wwbrT2Sps-k1sgsS3W1gM9jI
+
+### List academic years
+GET {{host}}/api/academic-years
+Authorization: Bearer {{token}}
+
+### Get academic year by id
+GET {{host}}/api/academic-years/1
+Authorization: Bearer {{token}}
+
+### Create academic year
+POST {{host}}/api/academic-years
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "2025/2026",
+  "startDate": "2025-07-01",
+  "endDate": "2026-06-30",
+  "status": "ACTIVE"
+}
+
+### Create academic year (Test Cascading Inactive)
+# Jika sudah ada academic year ACTIVE (misal 2024/2025) dan memiliki semester ACTIVE,
+# maka saat create academic year baru dengan status ACTIVE (misal 2026/2027),
+# academic year lama dan semester terkait akan otomatis menjadi INACTIVE
+POST {{host}}/api/academic-years
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "2026/2027",
+  "startDate": "2026-07-01",
+  "endDate": "2027-06-30",
+  "status": "ACTIVE"
+}
+
+### Update academic year
+PUT {{host}}/api/academic-years/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "2025/2026 - updated",
+  "startDate": "2025-07-01",
+  "endDate": "2026-06-30",
+  "status": "ACTIVE"
+}
+
+### Delete academic year
+DELETE {{host}}/api/academic-years/4
+Authorization: Bearer {{token}}

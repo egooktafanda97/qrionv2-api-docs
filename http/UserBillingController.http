@@ -1,0 +1,224 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0ZGM1Yjk1OS1hZmJiLTRlZGItOGExMy1hOTQxZGI5MmJjMjQiLCJpYXQiOjE3NjM4NjQxNDIsImV4cCI6MTc2Mzk1MDU0Mn0.8BNhbclI1gb4KJnga_9wwbrT2Sps-k1sgsS3W1gM9jI
+
+### Create user billing
+POST {{host}}/api/user-billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billing_id": 1,
+  "billed_user_id": 100
+}
+
+### Create user billing - minimal (only required fields)
+POST {{host}}/api/user-billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billing_id": 1,
+  "billed_user_id": 5
+}
+
+### Update user billing
+PUT {{host}}/api/user-billing/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "discount_value": 100000,
+  "discount_program": "Beasiswa Akademik",
+  "description": "Tagihan SPP Bulan November 2025 - Updated",
+  "notes": "Pembayaran sudah lunas"
+}
+
+### Update user billing - partial update
+PUT {{host}}/api/user-billing/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "notes": "Menunggu konfirmasi pembayaran"
+}
+
+### Get all user billings - Standard format
+GET {{host}}/api/user-billing?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: standard
+
+### Get all user billings - jQuery DataTable format
+GET {{host}}/api/user-billing?page=0&size=10&sortBy=id&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+### Get all user billings - Ant Design Table format
+GET {{host}}/api/user-billing?page=0&size=10&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+### Get all user billings - with pagination
+GET {{host}}/api/user-billing?page=0&size=20&sortBy=createdAt&sortDirection=ASC
+Authorization: Bearer {{token}}
+
+### Get user billing by ID
+GET {{host}}/api/user-billing/1
+Authorization: Bearer {{token}}
+
+### Get user billing by UUID
+GET {{host}}/api/user-billing/uuid/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{token}}
+
+### Get user billings by billed user ID - Standard format
+GET {{host}}/api/user-billing/user/5?page=0&size=10&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: standard
+
+### Get user billings by billed user ID - jQuery DataTable format
+GET {{host}}/api/user-billing/user/5?page=0&size=10&sortBy=id&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+### Get user billings by billed user ID - Ant Design Table format
+GET {{host}}/api/user-billing/user/5?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+### Get user billings by payment status UNPAID - Standard format
+GET {{host}}/api/user-billing/status/UNPAID?page=0&size=10&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: standard
+
+### Get user billings by payment status PAID - jQuery DataTable format
+GET {{host}}/api/user-billing/status/PAID?page=0&size=10&sortBy=id&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+### Get user billings by payment status PARTIAL - Ant Design Table format
+GET {{host}}/api/user-billing/status/PARTIAL?page=0&size=10&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+### Delete user billing (soft delete)
+DELETE {{host}}/api/user-billing/1
+Authorization: Bearer {{token}}
+
+### ===== Test Cases - Error Scenarios =====
+
+### Create user billing - Duplicate billing for same user (should fail)
+POST {{host}}/api/user-billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billing_id": 1,
+  "billed_user_id": 5
+}
+
+### Create user billing - Invalid billing_id (should fail)
+POST {{host}}/api/user-billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billing_id": 99999,
+  "billed_user_id": 5
+}
+
+### Create user billing - Invalid billed_user_id (should fail)
+POST {{host}}/api/user-billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billing_id": 1,
+  "billed_user_id": 99999
+}
+
+### Create user billing - Discount exceeds base amount (should fail)
+POST {{host}}/api/user-billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billing_id": 1,
+  "billed_user_id": 6,
+  "discount_value": 99999999
+}
+
+### Update user billing - Non-existent ID (should fail)
+PUT {{host}}/api/user-billing/99999
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "discount_value": 50000
+}
+
+### Update locked user billing (should fail if locked)
+PUT {{host}}/api/user-billing/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "notes": "Trying to update locked billing"
+}
+
+### Update paid user billing (should fail if paid)
+PUT {{host}}/api/user-billing/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "discount_value": 25000
+}
+
+### Delete locked user billing (should fail if locked)
+DELETE {{host}}/api/user-billing/1
+Authorization: Bearer {{token}}
+
+### Delete paid user billing (should fail if paid)
+DELETE {{host}}/api/user-billing/1
+Authorization: Bearer {{token}}
+
+### Get user billing - Non-existent ID (should fail)
+GET {{host}}/api/user-billing/99999
+Authorization: Bearer {{token}}
+
+### Get user billing - Invalid UUID (should fail)
+GET {{host}}/api/user-billing/uuid/invalid-uuid-format
+Authorization: Bearer {{token}}
+
+### ===== Test Cases - Validation =====
+
+### Create user billing - Missing required fields (should fail)
+POST {{host}}/api/user-billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "discount_value": 50000
+}
+
+### Create user billing - Negative discount (should fail)
+POST {{host}}/api/user-billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billing_id": 1,
+  "billed_user_id": 7,
+  "discount_value": -50000
+}
+
+### Create user billing - String too long (should fail)
+POST {{host}}/api/user-billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "billing_id": 1,
+  "billed_user_id": 8,
+  "discount_program": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+}

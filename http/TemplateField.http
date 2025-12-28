@@ -1,0 +1,33 @@
+### Get all template fields
+GET http://localhost:8081/api/template-fields
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Get template field by ID
+GET http://localhost:8081/api/template-fields/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Create new template field
+POST http://localhost:8081/api/template-fields
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "keyName": "nama_siswa",
+  "description": "Nama lengkap siswa"
+}
+
+### Update template field
+PUT http://localhost:8081/api/template-fields/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "keyName": "nama_siswa",
+  "description": "Nama lengkap siswa (updated)"
+}
+
+### Delete template field
+DELETE http://localhost:8081/api/template-fields/1
+Authorization: Bearer {{token}}

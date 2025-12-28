@@ -1,0 +1,96 @@
+### Environment Variables
+@host = http://localhost:8081
+@contentType = application/json
+
+###
+### AUTHENTICATION FLOW
+###
+
+### Step 1: Register Demo Institution (if needed)
+POST {{host}}/api/demo/register-institution
+Content-Type: {{contentType}}
+
+{
+  "name": "John Doe X",
+  "telephone": "6282284733405",
+  "positionId": 1,
+  "institutionName": "Demo School",
+  "institutionAddress": "Jl. Demo No. 123, Jakarta"
+}
+
+### Response: Demo institution registered successfully
+
+###
+### Step 2: Verify Registration OTP (if registering new institution)
+POST {{host}}/api/demo/register-otp-verify
+Content-Type: {{contentType}}
+
+{
+  "destination": "6282284733405",
+  "otpCode": "567341"
+}
+
+### Response: Verifikasi OTP berhasil
+
+###
+### Step 3: Send OTP for Login
+POST {{host}}/api/demo/login-with-otp
+Content-Type: {{contentType}}
+
+{
+  "destination": "6282284733405",
+  "channel": "WHATSAPP"
+}
+
+### Response: OTP will be sent to the destination via WhatsApp
+### Available channels: WHATSAPP, SMS, EMAIL
+
+###
+### Step 4: Verify Login OTP and Get Token
+# NOTE: Replace "123456" with the OTP code sent to your phone
+POST {{host}}/api/demo/login-otp-verify
+Content-Type: {{contentType}}
+
+{
+  "destination": "6282284733405",
+  "otpCode": "307643"
+}
+### Response Structure:
+# {
+#   "success": true,
+#   "message": "Verifikasi OTP berhasil",
+#   "data": {
+#     "token": "eyJhbGciOiJIUzI1NiJ9...",
+#     "userId": 1,
+#     "username": "demo",
+#     "name": "John Doe",
+#     "institutionId": 1,
+#     "yayasanId": 1
+#   }
+# }
+
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzOGQ2MGMzNy04MGUwLTRkMGUtOWZjNi0xMzc3NzIxODgxYjEiLCJpYXQiOjE3NjM3ODQ3OTYsImV4cCI6MTc2Mzg3MTE5Nn0.l1CALsVayEvZpg89i_Y8YlArdZVO71IPhEkbVk9Ht80
+
+###
+### USAGE: Copy the token from Step 4 response and paste it in @token variable above
+### Then use {{token}} in Authorization header for other API requests:
+### Authorization: Bearer {{token}}
+###
+
+#set pin
+PATCH {{host}}/api/users/38d60c37-80e0-4d0e-9fc6-1377721881b1/pin
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "pin": "1234"
+}
+
+#pin verify
+POST {{host}}/api/users/38d60c37-80e0-4d0e-9fc6-1377721881b1/pin/verify
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "pin": "1234"
+}

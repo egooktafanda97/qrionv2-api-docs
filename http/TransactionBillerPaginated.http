@@ -1,0 +1,47 @@
+### Variables
+@baseUrl = http://localhost:8081
+@token = YOUR_JWT_TOKEN_HERE
+
+### Get All Transactions - Paginated
+GET {{baseUrl}}/api/transaction-biller/list/all?page=0&size=10&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+### Get Transactions by User ID - Paginated
+# Lists all payment transactions for a specific user (billed user)
+GET {{baseUrl}}/api/transaction-biller/list/user/812?page=0&size=10&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+### Get Transactions by Billing ID - Paginated
+# Lists all payment transactions related to a specific billing (via user_billing relationship)
+GET {{baseUrl}}/api/transaction-biller/list/billing/99?page=0&size=10&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+### Example Response Structure
+# {
+#   "data": [
+#     {
+#       "id": 1,
+#       "invoiceNumber": "INV-2025-001",
+#       "invoiceBusiness": "School Name",
+#       "userPaymentId": 1,
+#       "userBilledId": 812,
+#       "amount": 500000,
+#       "channel": "ONLINE",
+#       "providerFee": 2500.00,
+#       "adminFee": 5000.00,
+#       "billType": "BANK_TRANSFER",
+#       "paymentType": "BANK_TRANSFER",
+#       "description": "Payment for tuition fee",
+#       "status": "PAID",
+#       "paidAt": "2025-12-07T20:00:00",
+#       "createdAt": "2025-12-07T19:00:00",
+#       "updatedAt": "2025-12-07T20:00:00"
+#     }
+#   ],
+#   "total": 45,
+#   "page": 0,
+#   "size": 10,
+#   "totalPages": 5,
+#   "hasNext": true,
+#   "hasPrevious": false
+# }

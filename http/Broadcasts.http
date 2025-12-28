@@ -1,0 +1,245 @@
+### Broadcasts - HTTP collection for VS Code REST Client
+# Replace {{baseUrl}} with `http://localhost:8081` (or your server URL)
+# Replace {{token}} with a valid JWT if you test authenticated endpoints
+
+# Create Category
+POST {{baseUrl}}/api/broadcasts/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Pengumuman Sekolah",
+  "description": "Kategori broadcast untuk pengumuman umum"
+}
+
+###
+
+# List Categories (pagination supported by Spring Pageable query params)
+GET {{baseUrl}}/api/broadcasts/categories?page=0&size=20
+Authorization: Bearer {{token}}
+
+###
+
+# Create Template
+POST {{baseUrl}}/api/broadcasts/templates
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "categoryId": 1,
+  "title": "Pengumuman Libur",
+  "content": "Besok sekolah libur karena peringatan hari kemerdekaan."
+}
+
+###
+
+# List Templates
+GET {{baseUrl}}/api/broadcasts/templates?page=0&size=20
+Authorization: Bearer {{token}}
+
+###
+
+# Create Broadcast (using a template)
+POST {{baseUrl}}/api/broadcasts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "templateId": 1,
+  "broadcastTitle": "Pengumuman - Libur Sekolah",
+  "finalContent": "Besok sekolah libur karena peringatan hari kemerdekaan.",
+  "messageType": "template",
+  "status": "draft",
+  "scheduledAt": "2025-12-20T09:00:00"
+}
+
+###
+
+# Create Broadcast (manual content)
+POST {{baseUrl}}/api/broadcasts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastTitle": "Pengumuman Penting",
+  "finalContent": "Ujian akhir dimulai hari Senin. Persiapkan diri.",
+  "messageType": "manual",
+  "status": "draft"
+}
+
+###
+
+# List Broadcasts
+GET {{baseUrl}}/api/broadcasts?page=0&size=20
+Authorization: Bearer {{token}}
+
+###
+
+# Add Recipient to Broadcast (Simple)
+POST {{baseUrl}}/api/broadcasts/recipients
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890"
+}
+
+###
+
+# Add Recipient to Broadcast with Message Personalization
+# UPDATED: Now supports per-recipient message personalization via messageItem
+POST {{baseUrl}}/api/broadcasts/recipients/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890",
+  "recipientGroup": "class-10a",
+  "messageItem": {
+    "name": "Budi",
+    "class": "10A",
+    "tuition": "Rp 1.500.000"
+  }
+}
+
+###
+
+# Send Broadcast to Multiple Recipients (Bulk)
+# UPDATED: Supports bulk operations with individual message personalization
+POST {{baseUrl}}/api/broadcasts/recipients/bulk/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 2,
+  "recipients": [
+    {
+      "studentId": 12347,
+      "studentName": "Rudi Hartono",
+      "whatsappNumber": "6281234567892",
+      "recipientGroup": "class-10b",
+      "messageItem": {
+        "name": "Rudi",
+        "class": "10B",
+        "studentId": "22001",
+        "score": "85"
+      }
+    },
+    {
+      "studentId": 12348,
+      "studentName": "Siti Nurhaliza",
+      "whatsappNumber": "6281234567893",
+      "recipientGroup": "class-10b",
+      "messageItem": {
+        "name": "Siti",
+        "class": "10B",
+        "studentId": "22002",
+        "score": "92"
+      }
+    }
+  ]
+}
+
+###
+
+# Schedule Broadcast (Delayed Delivery)
+# UPDATED: Schedule delivery with optional message personalization
+POST {{baseUrl}}/api/broadcasts/recipients/schedule?scheduleDate=2025-12-25T09:00:00
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890",
+  "recipientGroup": "announcement",
+  "messageItem": {
+    "name": "Budi",
+    "occasion": "Christmas",
+    "message": "Selamat hari raya"
+  }
+}
+
+###
+
+# Monthly Recurring Broadcast
+# UPDATED: Send monthly (every month on specified day) with message personalization
+POST {{baseUrl}}/api/broadcasts/recipients/monthly?dayOfMonth=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 4,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890",
+  "recipientGroup": "billing-reminder",
+  "messageItem": {
+    "name": "Budi",
+    "month": "January",
+    "amount": "Rp 1.500.000",
+    "dueDate": "10th"
+  }
+}
+
+###
+
+# List Recipients for Broadcast (if endpoint exists)
+# GET {{baseUrl}}/api/broadcasts/1/recipients
+# Authorization: Bearer {{token}}
+
+###
+
+# BROADCAST RECIPIENT FIELDS & PERSONALIZATION
+# ============================================
+#
+# NEW: Message Personalization Features
+# - messageItem: Object with template variables for message personalization
+# - message: TEXT field in BroadcastRecipient stores final rendered message
+# - Supports key-value replacement: {{key}} → value from messageItem
+#
+# Example Template:
+# "Halo {{name}}, tuition Anda adalah {{tuition}}"
+#
+# With messageItem:
+# {"name": "Budi", "tuition": "Rp 1.500.000"}
+#
+# Result Message:
+# "Halo Budi, tuition Anda adalah Rp 1.500.000"
+#
+# Payload Fields:
+# - broadcastId (required): ID of broadcast
+# - studentId (required): Student/recipient ID
+# - studentName (required): Student name
+# - whatsappNumber (required): WhatsApp number (format: 62XXXXXXXXXX)
+# - recipientGroup (optional): For grouping/categorizing recipients
+# - messageItem (optional): Object for template variable replacement
+#
+# Delivery Options:
+# - send-now: Immediate delivery
+# - schedule: Scheduled delivery (use scheduleDate parameter)
+# - monthly: Recurring monthly (use dayOfMonth parameter)
+#
+# Bulk Operations:
+# - /bulk-id/send-now: Bulk by student IDs
+# - /bulk-id/schedule: Bulk scheduled by student IDs
+# - /bulk-id/monthly: Bulk monthly by student IDs
+# - /bulk/send-now: Bulk direct (full recipient objects)
+# - /bulk/schedule: Bulk scheduled (full recipient objects)
+# - /bulk/monthly: Bulk monthly (full recipient objects)
+#
+# For full documentation and examples, see: BroadcastRecipient.http
+#
+# Notes:
+# - The server must be running on the specified base URL (default in dev: http://localhost:8081).
+# - Use a valid Authorization token (or remove header if testing unauthenticated behavior).
+# - Pageable params: use `page` and `size` query params as needed.
+# - WhatsApp integration must be configured for actual message delivery.
+# - All messageItem values will be used for template replacement.

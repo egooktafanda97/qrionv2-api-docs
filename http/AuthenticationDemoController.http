@@ -1,0 +1,36 @@
+### Register demo institution
+POST http://localhost:8081/api/demo/register-institution
+Content-Type: application/json
+
+{
+  "name": "Demo Institution",
+  "email": "demo@example.com",
+  "phone": "081234567890"
+}
+
+### Verify demo OTP
+POST http://localhost:8081/api/demo/register-otp-verify
+Content-Type: application/json
+
+{
+  "destination": "081234567890",
+  "otpCode": "123456"
+}
+
+### Send login OTP
+POST http://localhost:8081/api/demo/login-with-otp
+Content-Type: application/json
+
+{
+  "destination": "081234567890",
+  "channel": "SMS"
+}
+
+### Verify login OTP
+POST http://localhost:8081/api/demo/login-otp-verify
+Content-Type: application/json
+
+{
+  "destination": "081234567890",
+  "otpCode": "123456"
+}

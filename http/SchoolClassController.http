@@ -1,0 +1,49 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxN2ZlYWI3Ny1jZTgyLTRkMjQtOTI4ZC0xYzEzYjFjZWE4ZDEiLCJpYXQiOjE3NjM5NDU3NzYsImV4cCI6MTc2NDAzMjE3Nn0.t5g0Sb1bHsDf3828DagbjoMpKe0oneU2Em_Id6WwjlY
+
+### List school classes
+GET {{host}}/api/school-classes
+Authorization: Bearer {{token}}
+
+### Get school class by id
+GET {{host}}/api/school-classes/1
+Authorization: Bearer {{token}}
+
+### Create school class
+POST {{host}}/api/school-classes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "code": "1A",
+  "name": "Kelas 1A",
+  "level": 1,
+  "status": "ACTIVE"
+}
+
+### Create school class without code (auto-generate)
+POST {{host}}/api/school-classes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "II",
+  "level": 2
+}
+
+### Update school class
+PUT {{host}}/api/school-classes/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "code": "1A",
+  "name": "Kelas 1A - Updated",
+  "level": 1,
+  "status": "ACTIVE"
+}
+
+### Delete school class
+DELETE {{host}}/api/school-classes/1
+Authorization: Bearer {{token}}

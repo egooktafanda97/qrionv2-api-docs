@@ -1,0 +1,11 @@
+### Get Billing General by Academic Year
+GET {{baseUrl}}/api/billing-by-academic-year/general?academicYearId=1
+Authorization: Bearer {{token}}
+
+### Get Billing Monthly by Academic Year
+GET {{baseUrl}}/api/billing-by-academic-year/monthly?academicYearId=1
+Authorization: Bearer {{token}}
+
+### Get All Billing by Academic Year (GENERAL + MONTHLY)
+GET {{baseUrl}}/api/all?academicYearId=1
+Authorization: Bearer {{token}}

@@ -1,0 +1,81 @@
+### Get All Taxes
+GET http://localhost:8081/api/taxes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Get Active Taxes Only
+GET http://localhost:8081/api/taxes/active
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Get Tax by ID
+GET http://localhost:8081/api/taxes/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Create New Tax - PPh 21%
+POST http://localhost:8081/api/taxes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "PPh 21%",
+  "percentage": 21.00,
+  "description": "Pajak Penghasilan 21%",
+  "isActive": true
+}
+
+### Create New Tax - PPh 15%
+POST http://localhost:8081/api/taxes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "PPh 15%",
+  "percentage": 15.00,
+  "description": "Pajak Penghasilan 15%",
+  "isActive": true
+}
+
+### Create Tax - Validation Error (Duplicate Name)
+POST http://localhost:8081/api/taxes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "PPN 11%",
+  "percentage": 11.00,
+  "description": "Duplicate name test",
+  "isActive": true
+}
+
+### Create Tax - Validation Error (Percentage > 100)
+POST http://localhost:8081/api/taxes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Invalid Tax",
+  "percentage": 150.00,
+  "description": "Invalid percentage",
+  "isActive": true
+}
+
+### Update Tax by ID
+PUT http://localhost:8081/api/taxes/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "PPN 11% Updated",
+  "percentage": 11.50,
+  "description": "Updated PPn rate",
+  "isActive": true
+}
+
+### Delete Tax by ID
+DELETE http://localhost:8081/api/taxes/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###

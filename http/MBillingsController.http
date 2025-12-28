@@ -1,0 +1,185 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI5OTVlZWE4Yy1iN2IzLTQ3ZDEtOTk5Zi1jOGNiYzg3MTRmZWQiLCJpYXQiOjE3NjQwNzE3NTUsImV4cCI6MTc2NDE1ODE1NX0.SlH8SFK4Mz_fhQMUEhV_qZpG694DgrRuO5jCKXuLeeo
+
+###
+### MASTER BILLINGS - Supports 2 Types: MONTHLY & GENERAL
+### 
+### Type MONTHLY: 
+###   - Master untuk generate tagihan bulanan berulang (SPP, Uang Kegiatan Bulanan, dll)
+###   - Wajib memiliki monthlyActive (bulan 1-12)
+###   - Akan berelasi dengan tabel m_billing_monthly_active
+###   - Auto-generate Billing per bulan dari startDatePeriod sampai endDatePeriod
+###   - Jika endDatePeriod null, generate 1 tahun dari startDatePeriod
+###
+### Type GENERAL: 
+###   - Master untuk tagihan parsial sekali bayar (Uang Buku, Seragam, Gedung, dll)
+###   - TIDAK boleh ada monthlyActive
+###   - TIDAK berelasi dengan m_billing_monthly_active
+###   - Auto-generate 1 Billing saja saat dibuat
+###
+
+### 1. Create Master Billing - Type MONTHLY (Full Year)
+POST {{host}}/api/m-billings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY",
+  "name": "BIAYA SPP",
+  "description": "Biaya SPP per bulan",
+  "amount": 500000,
+  "collectDate": 1,
+  "dueDateOffset": 7,
+  "startDatePeriod": "2025-01-01",
+  "endDatePeriod": "2025-12-31",
+  "isAutoGenerate": true,
+  "monthlyActive": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+}
+
+### 2. Create Master Billing - Type MONTHLY (10 bulan - skip Juli & Agustus)
+POST {{host}}/api/m-billings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY",
+  "institutionId": 1,
+  "name": "Uang Kegiatan Bulanan",
+  "description": "Biaya kegiatan ekstrakurikuler",
+  "amount": 200000,
+  "collectDate": 15,
+  "dueDateOffset": 5,
+  "startDatePeriod": "2025-01-01",
+  "endDatePeriod": null,
+  "isAutoGenerate": true,
+  "monthlyActive": [1, 2, 3, 4, 5, 6, 9, 10, 11, 12]
+}
+
+### 3. Create Master Billing - Type MONTHLY (Semester - 6 bulan pertama) dengan user_billed
+POST {{host}}/api/m-billings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY",
+  "name": "Biaya Semester Ganjil",
+  "description": "Biaya semester ganjil dibayar di 6 bulan pertama",
+  "amount": 750000,
+  "collectDate": 5,
+  "dueDateOffset": 7,
+  "startDatePeriod": "2025-01-01",
+  "endDatePeriod": "2025-06-30",
+  "isAutoGenerate": true,
+  "monthlyActive": [1, 2, 3, 4, 5, 6],
+  "userBilled": ["user-uuid-1", "user-uuid-2", "1", "2"]
+}
+
+### 4. Create Master Billing - Type GENERAL (Uang Buku - 1x bayar)
+POST {{host}}/api/m-billings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "GENERAL",
+  "name": "Uang Buku Pelajaran",
+  "description": "Biaya buku pelajaran tahun ajaran 2025/2026",
+  "amount": 350000,
+  "collectDate": 10,
+  "dueDateOffset": 14,
+  "startDatePeriod": "2025-07-01"
+  "isAutoGenerate": false
+}
+
+### 5. Create Master Billing - Type GENERAL (Uang Seragam - 1x bayar)
+POST {{host}}/api/m-billings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "GENERAL",
+  "name": "Uang Seragam",
+  "description": "Biaya seragam sekolah lengkap",
+  "amount": 500000,
+  "isAutoGenerate": false
+}
+
+### 6. Create Master Billing - Type GENERAL (Uang Gedung)
+POST {{host}}/api/m-billings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "GENERAL",
+  "institutionId": 1,
+  "name": "Uang Gedung",
+  "description": "Biaya pembangunan gedung baru",
+  "amount": 2000000,
+  "isAutoGenerate": false
+}
+
+### Update Master Billing Monthly dengan user_billed
+PUT {{host}}/api/m-billings/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY",
+  "monthlyActive": [1, 2, 3, 4, 5, 6],
+  "userBilled": ["user-uuid-1", "user-uuid-3", "3", "4"]
+}
+
+### Update Master Billing Monthly - Remove all users
+PUT {{host}}/api/m-billings/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "billingType": "MONTHLY",
+  "monthlyActive": [1, 2, 3, 4, 5, 6],
+  "userBilled": []
+}
+
+### Get All Master Billing Monthly
+GET {{host}}/api/m-billings
+Authorization: Bearer {{token}}
+
+### Get Master Billing Monthly by ID
+GET {{host}}/api/m-billings/3
+Authorization: Bearer {{token}}
+
+### Get Master Billing Monthly by UUID
+GET {{host}}/api/m-billings/uuid/{uuid}
+Authorization: Bearer {{token}}
+
+### Update Monthly Active - Remove bulan 6 (Juni)
+PATCH {{host}}/api/m-billings/monthly-active
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1,
+  "monthlyActive": [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12]
+}
+
+### Update Monthly Active - Hanya bulan efektif sekolah (10 bulan)
+PATCH {{host}}/api/m-billings/monthly-active
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "mBillingsId": 1,
+  "monthlyActive": [1, 2, 3, 4, 5, 6, 9, 10, 11, 12]
+}
+
+### Disable Master Billing Monthly
+PATCH {{host}}/api/m-billings/3/disable
+Authorization: Bearer {{token}}
+
+### Enable Master Billing Monthly
+PATCH {{host}}/api/m-billings/3/enable
+Authorization: Bearer {{token}}
+
+### Delete Master Billing Monthly (Soft Delete)
+DELETE {{host}}/api/m-billings/1
+Authorization: Bearer {{token}}

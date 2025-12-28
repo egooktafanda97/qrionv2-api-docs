@@ -1,0 +1,83 @@
+### Role Management API Testing
+
+@baseUrl = http://localhost:8081
+@token = Bearer YOUR_JWT_TOKEN_HERE
+
+### 1. Get All Roles (Standard Format)
+GET {{baseUrl}}/api/roles?page=0&size=10&sortBy=id&sortDirection=ASC
+Authorization: {{token}}
+Content-Type: application/json
+
+### 2. Get All Roles (Ant Design Table Format)
+GET {{baseUrl}}/api/roles?page=0&size=10&sortBy=id&sortDirection=ASC
+Authorization: {{token}}
+Content-Type: application/json
+format: ant-table
+
+### 3. Get All Roles (jQuery DataTable Format)
+GET {{baseUrl}}/api/roles?page=0&size=10&sortBy=id&sortDirection=ASC&draw=1
+Authorization: {{token}}
+Content-Type: application/json
+format: jquery-datatable
+
+### 4. Get Role by ID
+GET {{baseUrl}}/api/roles/1
+Authorization: {{token}}
+Content-Type: application/json
+
+### 5. Create New Role
+POST {{baseUrl}}/api/roles
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "name": "CUSTOM_ROLE"
+}
+
+### 6. Update Role
+PUT {{baseUrl}}/api/roles/8
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "name": "UPDATED_ROLE"
+}
+
+### 7. Delete Role
+DELETE {{baseUrl}}/api/roles/8
+Authorization: {{token}}
+Content-Type: application/json
+
+### 8. Assign Privileges to Role
+POST {{baseUrl}}/api/roles/1/privileges
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "roleId": 1,
+  "privilegeIds": [1, 2, 3, 4, 5]
+}
+
+### 9. Assign Multiple Privileges to Role
+POST {{baseUrl}}/api/roles/2/privileges
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "roleId": 2,
+  "privilegeIds": [6, 7, 8, 9, 10, 11, 12]
+}
+
+### 10. Remove Privileges from Role
+DELETE {{baseUrl}}/api/roles/1/privileges
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "roleId": 1,
+  "privilegeIds": [3, 4]
+}
+
+### 11. Get All Privileges (to check available privilege IDs)
+# Note: You'll need a PrivilegeController for this, or check database directly
+# SELECT id, name, group_code FROM privileges;

@@ -1,0 +1,299 @@
+### Student Bulk Operations API Testing
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxN2ZlYWI3Ny1jZTgyLTRkMjQtOTI4ZC0xYzEzYjFjZWE4ZDEiLCJpYXQiOjE3NjM5NDU3NzYsImV4cCI6MTc2NDAzMjE3Nn0.t5g0Sb1bHsDf3828DagbjoMpKe0oneU2Em_Id6WwjlY
+
+###
+### BULK CREATE STUDENTS
+###
+
+### 1. Bulk Create Students - Success (Import dari Excel/CSV)
+# Use case: Admin mengimpor data siswa dari file Excel/CSV
+POST {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "students": [
+    {
+      "name": "Ahmad Fauzi",
+      "gender": "L",
+      "dateOfBirth": "2015-06-15",
+      "placeOfBirth": "Jakarta",
+      "religion": "ISLAM",
+      "province": "DKI Jakarta",
+      "city": "Jakarta Selatan",
+      "district": "Kebayoran Baru",
+      "fullAddress": "Jl. Senopati No. 10",
+      "phone": "081234567001",
+      "parentName": "Budi Fauzi",
+      "parentPhone": "081234567891"
+    },
+    {
+      "name": "Siti Aminah",
+      "gender": "P",
+      "dateOfBirth": "2015-08-20",
+      "placeOfBirth": "Bandung",
+      "religion": "ISLAM",
+      "province": "Jawa Barat",
+      "city": "Bandung",
+      "district": "Bandung Selatan",
+      "fullAddress": "Jl. Dago No. 25",
+      "phone": "081234567002",
+      "parentName": "Hasan Aminah",
+      "parentPhone": "081234567892"
+    },
+    {
+      "name": "Budi Santoso",
+      "gender": "L",
+      "dateOfBirth": "2016-03-10",
+      "placeOfBirth": "Surabaya",
+      "religion": "KRISTEN",
+      "province": "Jawa Timur",
+      "city": "Surabaya",
+      "district": "Surabaya Pusat",
+      "fullAddress": "Jl. Tunjungan No. 40",
+      "phone": "081234567003",
+      "parentName": "Joko Santoso",
+      "parentPhone": "081234567893"
+    }
+  ]
+}
+
+### 2. Bulk Create - Minimal Data (Auto-generate NIS and User)
+# Some fields are optional, NIS and User will be auto-generated
+POST {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "students": [
+    {
+      "name": "Dewi Sartika",
+      "gender": "P",
+      "dateOfBirth": "2015-12-05",
+      "parentName": "Suparman",
+      "parentPhone": "081234567894"
+    },
+    {
+      "name": "Eko Prasetyo",
+      "gender": "L",
+      "dateOfBirth": "2016-01-18",
+      "parentName": "Sutrisno",
+      "parentPhone": "081234567895"
+    }
+  ]
+}
+
+### 3. Bulk Create - Partial Failure
+# Some students succeed, some fail (e.g., missing required fields, duplicate NIS)
+POST {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "students": [
+    {
+      "name": "Valid Student 1",
+      "gender": "L",
+      "dateOfBirth": "2015-05-10",
+      "parentName": "Parent 1",
+      "parentPhone": "081234567896"
+    },
+    {
+      "name": "",
+      "gender": "P",
+      "dateOfBirth": "2015-06-20",
+      "parentName": "Parent 2",
+      "parentPhone": "081234567897"
+    },
+    {
+      "name": "Valid Student 3",
+      "gender": "L",
+      "dateOfBirth": "2015-07-30",
+      "parentName": "Parent 3",
+      "parentPhone": "081234567898"
+    }
+  ]
+}
+
+### 4. Bulk Create - Empty List
+# Should fail validation
+POST {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "students": []
+}
+
+###
+### BULK UPDATE STUDENTS
+###
+
+### 5. Bulk Update Students - Success
+# Use case: Update multiple students information at once
+PUT {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "students": [
+    {
+      "id": "1",
+      "data": {
+        "name": "Ahmad Fauzi Updated",
+        "gender": "L",
+        "dateOfBirth": "2015-06-15",
+        "placeOfBirth": "Jakarta",
+        "religion": "ISLAM",
+        "province": "DKI Jakarta",
+        "city": "Jakarta Pusat",
+        "district": "Menteng",
+        "fullAddress": "Jl. Menteng Raya No. 50",
+        "phone": "081234567111",
+        "studentStatus": "ACTIVE",
+        "parentName": "Budi Fauzi Updated",
+        "parentPhone": "081234567911"
+      }
+    },
+    {
+      "id": "2",
+      "data": {
+        "name": "Siti Aminah Updated",
+        "gender": "P",
+        "dateOfBirth": "2015-08-20",
+        "placeOfBirth": "Bandung",
+        "religion": "ISLAM",
+        "province": "Jawa Barat",
+        "city": "Bandung",
+        "district": "Bandung Utara",
+        "fullAddress": "Jl. Setiabudhi No. 100",
+        "phone": "081234567222",
+        "studentStatus": "ACTIVE",
+        "parentName": "Hasan Aminah Updated",
+        "parentPhone": "081234567922"
+      }
+    }
+  ]
+}
+
+### 6. Bulk Update - Using UUID
+# Students can be identified by UUID instead of integer ID
+PUT {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "students": [
+    {
+      "id": "17feab77-ce82-4d24-928d-1c13b1cea8d1",
+      "data": {
+        "name": "Student UUID Updated",
+        "gender": "L",
+        "dateOfBirth": "2015-09-12",
+        "parentName": "Parent UUID",
+        "parentPhone": "081234567933"
+      }
+    }
+  ]
+}
+
+### 7. Bulk Update - Partial Failure
+# Some students succeed, some fail (student not found, invalid ID)
+PUT {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "students": [
+    {
+      "id": "1",
+      "data": {
+        "name": "Valid Update",
+        "gender": "L",
+        "dateOfBirth": "2015-05-15",
+        "parentName": "Valid Parent",
+        "parentPhone": "081234567944"
+      }
+    },
+    {
+      "id": "99999",
+      "data": {
+        "name": "Non-existent Student",
+        "gender": "P",
+        "dateOfBirth": "2015-06-20",
+        "parentName": "Non-existent Parent",
+        "parentPhone": "081234567955"
+      }
+    },
+    {
+      "id": "invalid-id-format",
+      "data": {
+        "name": "Invalid ID",
+        "gender": "L",
+        "dateOfBirth": "2015-07-25",
+        "parentName": "Invalid Parent",
+        "parentPhone": "081234567966"
+      }
+    }
+  ]
+}
+
+###
+### BULK DELETE STUDENTS
+###
+
+### 8. Bulk Delete Students - Success (Checkbox Selection)
+# Use case: Admin selects multiple students via checkbox and deletes them
+DELETE {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentIds": ["1", "2", "3"]
+}
+
+### 9. Bulk Delete - Mixed IDs and UUIDs
+# Student identifiers can be integer IDs or UUID strings
+DELETE {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentIds": [
+    "4",
+    "5",
+    "17feab77-ce82-4d24-928d-1c13b1cea8d1"
+  ]
+}
+
+### 10. Bulk Delete - Partial Failure
+# Some students succeed, some fail (not found, permission denied)
+DELETE {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentIds": ["6", "7", "99999", "invalid-uuid"]
+}
+
+### 11. Bulk Delete - Empty List
+# Should fail validation
+DELETE {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentIds": []
+}
+
+### 12. Bulk Delete - Student Not Found
+# All students do not exist
+DELETE {{host}}/api/students/bulk
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "studentIds": ["99991", "99992", "99993"]
+}

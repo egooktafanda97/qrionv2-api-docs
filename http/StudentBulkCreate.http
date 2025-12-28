@@ -1,0 +1,93 @@
+### Variables
+@baseUrl = http://localhost:8081
+@token = YOUR_JWT_TOKEN_HERE
+
+### Bulk Create Students
+POST {{baseUrl}}/api/students/bulk
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "students": [
+    {
+      "name": "Ferdinand Halim",
+      "nis": "2025602",
+      "gender": "L",
+      "placeOfBirth": "Semarang",
+      "dateOfBirth": "2013-09-14",
+      "religion": "KATOLIK",
+      "province": "Jawa Tengah",
+      "city": "Semarang",
+      "district": "Tembalang",
+      "fullAddress": "Jl. Sendangmulyo Indah No. 9",
+      "phone": "082311445598",
+      "studentStatus": "ACTIVE",
+      "parentName": "Laurentius Halim",
+      "parentPhone": "081229944533"
+    },
+    {
+      "name": "Michelle Prameswari",
+      "nis": "2025603",
+      "gender": "P",
+      "placeOfBirth": "Bandung",
+      "dateOfBirth": "2014-03-22",
+      "religion": "KRISTEN",
+      "province": "Jawa Barat",
+      "city": "Bandung",
+      "district": "Coblong",
+      "fullAddress": "Jl. Teuku Umar No. 17",
+      "phone": "081223567891",
+      "studentStatus": "ACTIVE",
+      "parentName": "Dewi Prameswari",
+      "parentPhone": "087863446781"
+    },
+    {
+      "name": "Andika Surya Pratama",
+      "nis": "2025604",
+      "gender": "L",
+      "placeOfBirth": "Surabaya",
+      "dateOfBirth": "2013-11-05",
+      "religion": "ISLAM",
+      "province": "Jawa Timur",
+      "city": "Surabaya",
+      "district": "Wonokromo",
+      "fullAddress": "Jl. Darmo Baru I No.12",
+      "phone": "085231122567",
+      "studentStatus": "ACTIVE",
+      "parentName": "Sutrisno Pratama",
+      "parentPhone": "081335722190"
+    },
+    {
+      "name": "Yohana Grace Natalia",
+      "nis": "2025605",
+      "gender": "P",
+      "placeOfBirth": "Yogyakarta",
+      "dateOfBirth": "2014-07-19",
+      "religion": "KATOLIK",
+      "province": "DI Yogyakarta",
+      "city": "Yogyakarta",
+      "district": "Umbulharjo",
+      "fullAddress": "Jl. Kusumanegara No. 28",
+      "phone": "082145776322",
+      "studentStatus": "ACTIVE",
+      "parentName": "Benedictus Suryawan",
+      "parentPhone": "089632245118"
+    },
+    {
+      "name": "Rafael Jonathan",
+      "nis": "2025606",
+      "gender": "L",
+      "placeOfBirth": "Jakarta",
+      "dateOfBirth": "2013-12-10",
+      "religion": "KRISTEN",
+      "province": "DKI Jakarta",
+      "city": "Jakarta Barat",
+      "district": "Cengkareng",
+      "fullAddress": "Jl. Daan Mogot KM 14",
+      "phone": "085267814523",
+      "studentStatus": "ACTIVE",
+      "parentName": "Felix Jonathan",
+      "parentPhone": "081229998822"
+    }
+  ]
+}

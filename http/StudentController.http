@@ -1,0 +1,367 @@
+### Student API - HTTP collection for VS Code REST Client
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0ZGM1Yjk1OS1hZmJiLTRlZGItOGExMy1hOTQxZGI5MmJjMjQiLCJpYXQiOjE3NjM4NjQxNDIsImV4cCI6MTc2Mzk1MDU0Mn0.8BNhbclI1gb4KJnga_9wwbrT2Sps-k1sgsS3W1gM9jI
+
+### ======================================
+### BASIC STUDENT ENDPOINTS
+### ======================================
+
+### List students (Standard Format - Paginated)
+GET {{host}}/api/students?page=0&size=20&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### List students (jQuery DataTable Format)
+GET {{host}}/api/students?page=0&size=20&sortBy=id&sortDirection=DESC&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+###
+
+### List students (Ant Design Table Format)
+GET {{host}}/api/students?page=0&size=20&sortBy=id&sortDirection=DESC
+Authorization: Bearer {{token}}
+format: ant-table
+
+###
+
+### Get student by id
+GET {{host}}/api/students/1
+Authorization: Bearer {{token}}
+
+###
+
+### ======================================
+### ADVANCED SEARCH ENDPOINT
+### ======================================
+
+### Search students (All filters - Standard Format)
+GET {{host}}/api/students/search?page=0&size=20&sortBy=id&sortDirection=DESC&search=budi&nis=2025001&name=Budi&uuid=&phone=0812&parentName=Sugeng&academicYearId=1&classId=1&subClassId=1
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (Free text search only)
+GET {{host}}/api/students/search?page=0&size=20&search=budi
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (Filter by NIS)
+GET {{host}}/api/students/search?page=0&size=20&nis=2025001
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (Filter by Name)
+GET {{host}}/api/students/search?page=0&size=20&name=Budi
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (Filter by Phone)
+GET {{host}}/api/students/search?page=0&size=20&phone=0812
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (Filter by Parent Name)
+GET {{host}}/api/students/search?page=0&size=20&parentName=Ahmad
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (Filter by Academic Year)
+GET {{host}}/api/students/search?page=0&size=20&academicYearId=1
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (Filter by Class)
+GET {{host}}/api/students/search?page=0&size=20&classId=1
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (Filter by SubClass)
+GET {{host}}/api/students/search?page=0&size=20&subClassId=1
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (Combined filters)
+GET {{host}}/api/students/search?page=0&size=20&academicYearId=1&classId=1&name=budi
+Authorization: Bearer {{token}}
+
+###
+
+### Search students (jQuery DataTable Format)
+GET {{host}}/api/students/search?page=0&size=20&search=budi&draw=1
+Authorization: Bearer {{token}}
+format: jquery-datatable
+
+###
+
+### Search students (Ant Design Table Format)
+GET {{host}}/api/students/search?page=0&size=20&search=budi
+Authorization: Bearer {{token}}
+format: ant-table
+
+###
+
+### ======================================
+### COMPACT LIST ENDPOINT
+### ======================================
+
+### Get compact student list (Required for Frontend Dropdowns)
+# Returns non-paginated list with: id, nama, nisn, kelas, status
+# Required parameter: academicYearId
+GET {{host}}/api/students/compact?academicYearId=1
+Authorization: Bearer {{token}}
+
+###
+
+###
+
+### ======================================
+### CREATE, UPDATE, DELETE ENDPOINTS
+### ======================================
+
+### Create student with complete data
+POST {{host}}/api/students
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Budi Santoso",
+  "nis": "2025001",
+  "gender": "L",
+  "placeOfBirth": "Jakarta",
+  "dateOfBirth": "2015-05-01",
+  "religion": "ISLAM",
+  "province": "DKI Jakarta",
+  "city": "Jakarta Selatan",
+  "district": "Kebayoran Baru",
+  "fullAddress": "Jl. Senopati No. 123",
+  "phone": "081234567890",
+  "studentStatus": "ACTIVE",
+  "parentName": "Sugeng Santoso",
+  "parentPhone": "081298765432"
+}
+
+###
+
+### Create student minimal (auto-generate NIS and User)
+POST {{host}}/api/students
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Siti Nurhaliza",
+  "gender": "P",
+  "dateOfBirth": "2016-03-15",
+  "parentName": "Ahmad Nurhaliza",
+  "parentPhone": "6282284733405"
+}
+
+###
+
+### Update student
+PUT {{host}}/api/students/4
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "nis": "2025006",
+  "name": "Budi Santoso Updated",
+  "phone": "081234567899"
+}
+
+###
+
+### Delete student
+DELETE {{host}}/api/students/1
+Authorization: Bearer {{token}}
+
+###
+
+### ======================================
+### BULK OPERATIONS ENDPOINTS
+### ======================================
+
+### Bulk Create Students (Import from Excel/CSV)
+POST {{host}}/api/students/bulk
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "students": [
+    {
+      "name": "Student Bulk 1",
+      "nis": "2025101",
+      "gender": "L",
+      "dateOfBirth": "2015-01-15",
+      "parentName": "Parent 1",
+      "parentPhone": "081111111111"
+    },
+    {
+      "name": "Student Bulk 2",
+      "nis": "2025102",
+      "gender": "P",
+      "dateOfBirth": "2015-02-20",
+      "parentName": "Parent 2",
+      "parentPhone": "081222222222"
+    },
+    {
+      "name": "Student Bulk 3",
+      "nis": "2025103",
+      "gender": "L",
+      "dateOfBirth": "2015-03-25",
+      "religion": "ISLAM",
+      "province": "DKI Jakarta",
+      "city": "Jakarta Selatan",
+      "district": "Kebayoran Lama",
+      "fullAddress": "Jl. Kebayoran Lama No. 456",
+      "parentName": "Parent 3",
+      "parentPhone": "081333333333"
+    }
+  ]
+}
+
+###
+
+### Bulk Update Students
+PUT {{host}}/api/students/bulk
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "updates": [
+    {
+      "id": 1,
+      "name": "Updated Student 1",
+      "phone": "081999999991"
+    },
+    {
+      "id": 2,
+      "nis": "2025999",
+      "studentStatus": "GRADUATED"
+    },
+    {
+      "id": 3,
+      "province": "Jawa Barat",
+      "city": "Bandung",
+      "district": "Cimahi",
+      "fullAddress": "Jl. Cimahi Raya No. 789"
+    }
+  ]
+}
+
+###
+
+### Bulk Delete Students
+DELETE {{host}}/api/students/bulk
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "ids": [10, 11, 12, 13, 14]
+}
+
+###
+
+### ======================================
+### NOTES AND DOCUMENTATION
+### ======================================
+
+# Student API Documentation
+#
+# Available Endpoints:
+# 1. GET /api/students - List all students (paginated)
+# 2. GET /api/students/{id} - Get student by ID
+# 3. GET /api/students/search - Advanced search with multiple filters
+# 4. GET /api/students/compact - Compact list for frontend dropdowns
+# 5. POST /api/students - Create single student
+# 6. PUT /api/students/{id} - Update single student
+# 7. DELETE /api/students/{id} - Delete single student
+# 8. POST /api/students/bulk - Bulk create students
+# 9. PUT /api/students/bulk - Bulk update students
+# 10. DELETE /api/students/bulk - Bulk delete students
+#
+# Pagination Parameters (for list and search endpoints):
+# - page (default: 0) - Page number, 0-indexed
+# - size (default: 10) - Number of items per page
+# - sortBy (default: "id") - Field to sort by
+# - sortDirection (default: "DESC") - ASC or DESC
+# - draw (optional) - For jQuery DataTables
+#
+# Response Formats (via format header):
+# - standard (default) - PageResponse with clean structure
+# - jquery-datatable - JQueryDataTableResponse
+# - ant-table - AntDesignTableResponse
+#
+# Search Filters (/api/students/search):
+# - search - Free text search across name, nis, uuid, phone, parentName, parentPhone, username
+# - nis - Filter by NIS (exact match)
+# - name - Filter by name (contains)
+# - uuid - Filter by UUID (exact match)
+# - phone - Filter by student or parent phone (contains)
+# - parentName - Filter by parent name (contains)
+# - academicYearId - Filter by academic year (requires enrollment)
+# - classId - Filter by class (requires enrollment)
+# - subClassId - Filter by subclass (requires enrollment)
+#
+# Search Response Structure:
+# Returns Map<String, Object> containing:
+# - student: StudentResponse object
+# - institution: {id, name}
+# - yayasan: {id, name}
+# - user: {id, username, name}
+# - parent: {id, name, phone}
+# - latestEnrollment: {academicYearId, classId, subClassId, classDisplay}
+#
+# Compact List (/api/students/compact):
+# Required parameter: academicYearId
+# Returns non-paginated list with: id, nama, nisn, kelas, status
+# Used for frontend dropdowns and select components
+#
+# Bulk Operations:
+# - POST /bulk - Create multiple students at once
+#   Request: {students: [StudentRequest, ...]}
+#   Response: {successCount, failedCount, totalRequested, successResults, failedResults}
+#
+# - PUT /bulk - Update multiple students at once
+#   Request: {updates: [{id, ...fields}, ...]}
+#   Response: {successCount, failedCount, totalRequested, successResults, failedResults}
+#
+# - DELETE /bulk - Delete multiple students at once
+#   Request: {ids: [1, 2, 3, ...]}
+#   Response: {successCount, failedCount, totalRequested, successResults, failedResults}
+#
+# Student Status Enum:
+# - ACTIVE - Currently enrolled
+# - INACTIVE - Not currently enrolled
+# - GRADUATED - Completed education
+# - TRANSFERRED - Moved to another institution
+# - DROPPED_OUT - Left education
+#
+# Gender Values:
+# - L (Laki-laki / Male)
+# - P (Perempuan / Female)
+#
+# Religion Values:
+# - ISLAM
+# - KRISTEN
+# - KATOLIK
+# - HINDU
+# - BUDDHA
+# - KONGHUCU
+#
+# Notes:
+# - NIS auto-generates if not provided
+# - User account auto-creates for each student
+# - Parent can be linked via parentName and parentPhone
+# - All timestamps use ISO-8601 format
+# - Soft delete is used (deletedAt field)

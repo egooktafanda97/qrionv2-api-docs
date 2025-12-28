@@ -1,0 +1,388 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0ZGM1Yjk1OS1hZmJiLTRlZGItOGExMy1hOTQxZGI5MmJjMjQiLCJpYXQiOjE3NjM4NjQxNDIsImV4cCI6MTc2Mzk1MDU0Mn0.8BNhbclI1gb4KJnga_9wwbrT2Sps-k1sgsS3W1gM9jI
+
+###############################################################################
+# WITHDRAWAL CONTROLLER - Withdrawal & Transit Management
+# 
+# Provides endpoints for:
+# 1. /otp/request - Request OTP for withdrawal operations
+# 2. /billing - Withdraw funds from BILLING account
+# 3. /transit - Transfer funds from BILLING to BILLING_CASH account
+# 4. /history - Get withdrawal and transit transaction history
+#
+# Authentication: Bearer token required for all endpoints
+# All operations are tied to authenticated user's institution
+###############################################################################
+
+### ============================================================================
+### OTP MANAGEMENT
+### ============================================================================
+
+### Request OTP for withdrawal (via WhatsApp)
+# Sends OTP code to user's registered telephone number via WhatsApp
+# 
+# Prerequisites:
+# - User must be authenticated (valid JWT token)
+# - User must have a telephone number registered in the system
+#
+# Flow:
+# 1. Call this endpoint to generate and send OTP
+# 2. OTP is sent to user's registered phone via WhatsApp
+# 3. Use the received OTP code for withdrawal/transit operations
+# 4. OTP expires after configured duration (typically 5-10 minutes)
+#
+# Response:
+# - message: "OTP sent" if successful, "Failed to send OTP" if failed
+# - Check user's WhatsApp for the OTP code
+#
+# Error cases:
+# - 401 Unauthorized: No authentication token provided or token invalid
+# - 400 Bad Request: User has no telephone number registered
+POST {{host}}/api/withdrawals/otp/request
+Authorization: Bearer {{token}}
+
+###
+
+### Request OTP for withdrawal (GET alternative)
+# Alternative GET method for simple client implementations
+# Same functionality as POST version
+# Useful for:
+# - Simple HTML forms or links
+# - Systems that prefer GET over POST for read operations
+# - Mobile deeplinks (intent:// URIs)
+#
+# Usage example:
+# <a href="{{host}}/api/withdrawals/otp/request?Authorization=Bearer{{token}}">
+#   Request OTP
+# </a>
+GET {{host}}/api/withdrawals/otp/request
+Authorization: Bearer {{token}}
+
+###
+
+### Request OTP - Response Example (Success)
+# {
+#   "success": true,
+#   "message": "OTP sent",
+#   "timestamp": "2025-12-25T14:30:45.123Z",
+#   "data": "OTP sent"
+# }
+
+### Request OTP - Response Example (Error - No Phone)
+# {
+#   "success": false,
+#   "message": "No telephone bound to user",
+#   "errorCode": "INVALID_INPUT",
+#   "timestamp": "2025-12-25T14:31:20.456Z"
+# }
+
+### Request OTP - Response Example (Error - Auth Failed)
+# {
+#   "success": false,
+#   "message": "Authentication required",
+#   "errorCode": "AUTH_FAILED",
+#   "timestamp": "2025-12-25T14:32:10.789Z"
+# }
+
+###
+
+### ============================================================================
+### WITHDRAWAL OPERATION
+### ============================================================================
+
+### Withdraw from BILLING account
+# Prerequisites:
+# - Must have valid OTP from /otp/request endpoint
+# - BILLING account must have sufficient balance
+# - Amount must be positive
+# 
+# Response includes:
+# - Transaction journal record
+# - Updated account balances (start and end)
+# - Invoice number for audit trail
+POST {{host}}/api/withdrawals/billing
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "otp_code": "123456",
+  "amount": 5000000.00
+}
+
+###
+
+### ============================================================================
+### TRANSIT OPERATION (BILLING → BILLING_CASH)
+### ============================================================================
+
+### Transit funds from BILLING to BILLING_CASH account
+# 
+# This operation transfers money between institution accounts:
+# - Debit: BILLING account (money out)
+# - Credit: BILLING_CASH account (money in)
+#
+# Features:
+# 1. Double-entry bookkeeping (debit/credit both recorded)
+# 2. Generates invoice for audit trail
+# 3. Updates both account balances atomically
+# 4. Records in TransactionJournal with both account references
+#
+# Request fields:
+# - amount: Transfer amount (required, must be positive)
+# - description: Optional transaction description
+# - referenceNumber: Optional reference for tracking
+#
+# Response includes:
+# - Both account IDs (debit=BILLING, credit=BILLING_CASH)
+# - Starting and ending balances for both accounts
+# - Invoice number
+# - Transaction timestamp
+POST {{host}}/api/withdrawals/transit
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "amount": 2500000.00,
+  "description": "Daily cash transfer to BILLING_CASH",
+  "referenceNumber": "TRX-20250101-001"
+}
+
+###
+
+### Transit funds - Minimal request (only amount required)
+POST {{host}}/api/withdrawals/transit
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "amount": 1000000.00
+}
+
+###
+
+### Transit funds - Large amount
+POST {{host}}/api/withdrawals/transit
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "amount": 10000000.00,
+  "description": "Monthly billing to cash transfer",
+  "referenceNumber": "MTH-202501-TRANSFER"
+}
+
+###
+
+### ============================================================================
+### HISTORY & REPORTING
+### ============================================================================
+
+### Get withdrawal/transit history - Default pagination
+# Returns all withdrawal and transit transactions
+# Default: page 0, size 10, sorted by ID descending
+GET {{host}}/api/withdrawals/history
+Authorization: Bearer {{token}}
+
+###
+
+### Get history - Custom pagination
+GET {{host}}/api/withdrawals/history?page=0&size=20&sortBy=timestampTxn&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### Get history - jQuery DataTable format
+# Used for DataTable.js integration (serverside processing)
+# Includes draw counter for DataTable synchronization
+GET {{host}}/api/withdrawals/history?page=0&size=10&draw=1&format=jquery-datatable
+Authorization: Bearer {{token}}
+
+###
+
+### Get history - Ant Design Table format
+# Used for Ant Design Table component in frontend
+GET {{host}}/api/withdrawals/history?page=0&size=10&format=ant-table
+Authorization: Bearer {{token}}
+
+###
+
+### Get history - Standard format (default)
+GET {{host}}/api/withdrawals/history?format=standard
+Authorization: Bearer {{token}}
+
+###
+
+### Get history - Sorted by creation date
+GET {{host}}/api/withdrawals/history?page=0&size=25&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{token}}
+
+###
+
+### ============================================================================
+### RESPONSE EXAMPLES
+### ============================================================================
+
+### @name Transit Success Response
+# {
+#   "success": true,
+#   "message": "Transit from BILLING to BILLING_CASH processed",
+#   "timestamp": "2025-01-15T10:30:45.123Z",
+#   "data": {
+#     "id": 1025,
+#     "uuid": "550e8400-e29b-41d4-a716-446655440000",
+#     "yayasanId": 1,
+#     "institutionId": 2,
+#     "referenceNumber": "TRX-20250101-001",
+#     "invoiceNumber": "INV-TRN-20250115103045-3456",
+#     "timestampTxn": "2025-01-15T10:30:45.123Z",
+#     "debitAccountId": 101,           # BILLING account
+#     "creditAccountId": 102,          # BILLING_CASH account
+#     "amount": 2500000.00,
+#     "feeAmount": 0.00,
+#     "providerFee": 0.00,
+#     "feeGlAccountId": null,
+#     "debitStartBalance": 50000000.00,    # BILLING start
+#     "debitEndBalance": 47500000.00,      # BILLING end
+#     "creditStartBalance": 5000000.00,    # BILLING_CASH start
+#     "creditEndBalance": 7500000.00,      # BILLING_CASH end
+#     "transactionType": "TRANSIT",
+#     "description": "Daily cash transfer to BILLING_CASH",
+#     "status": "SUCCESS",
+#     "systemSource": "CORE",
+#     "userInitiatorId": 1,
+#     "createdAt": "2025-01-15T10:30:45.123Z",
+#     "updatedAt": "2025-01-15T10:30:45.123Z"
+#   }
+# }
+
+###
+
+### @name History Response - Standard Format
+# {
+#   "success": true,
+#   "message": "Success",
+#   "timestamp": "2025-01-15T10:35:20.000Z",
+#   "data": {
+#     "data": [
+#       {
+#         "id": 1025,
+#         "uuid": "550e8400-e29b-41d4-a716-446655440000",
+#         "invoiceNumber": "INV-TRN-20250115103045-3456",
+#         "timestampTxn": "2025-01-15T10:30:45.123Z",
+#         "debitAccountId": 101,
+#         "creditAccountId": 102,
+#         "amount": 2500000.00,
+#         "transactionType": "TRANSIT",
+#         "status": "SUCCESS",
+#         "createdAt": "2025-01-15T10:30:45.123Z"
+#       },
+#       {
+#         "id": 1024,
+#         "uuid": "550e8400-e29b-41d4-a716-446655440001",
+#         "invoiceNumber": "INV-WD-20250115100000-2345",
+#         "timestampTxn": "2025-01-15T10:00:00.000Z",
+#         "debitAccountId": 101,
+#         "creditAccountId": null,
+#         "amount": 5000000.00,
+#         "transactionType": "WITHDRAWAL",
+#         "status": "SUCCESS",
+#         "createdAt": "2025-01-15T10:00:00.000Z"
+#       }
+#     ],
+#     "total": 25,
+#     "page": 0,
+#     "size": 10,
+#     "totalPages": 3,
+#     "hasNext": true,
+#     "hasPrevious": false
+#   }
+# }
+
+###
+
+### ============================================================================
+### ERROR RESPONSES
+### ============================================================================
+
+### @name Error: Insufficient Balance
+# {
+#   "success": false,
+#   "message": "Insufficient available balance in BILLING account",
+#   "timestamp": "2025-01-15T10:40:00.000Z",
+#   "errorCode": "INSUFFICIENT_BALANCE",
+#   "statusCode": 400
+# }
+
+###
+
+### @name Error: BILLING_CASH Account Not Found
+# {
+#   "success": false,
+#   "message": "Institution BILLING_CASH account not found",
+#   "timestamp": "2025-01-15T10:41:00.000Z",
+#   "errorCode": "RESOURCE_NOT_FOUND",
+#   "statusCode": 404
+# }
+
+###
+
+### @name Error: Invalid Amount
+# {
+#   "success": false,
+#   "message": "Amount must be positive",
+#   "timestamp": "2025-01-15T10:42:00.000Z",
+#   "errorCode": "INVALID_INPUT",
+#   "statusCode": 400
+# }
+
+###
+
+### @name Error: Authentication Failed
+# {
+#   "success": false,
+#   "message": "Authentication required",
+#   "timestamp": "2025-01-15T10:43:00.000Z",
+#   "errorCode": "AUTH_FAILED",
+#   "statusCode": 401
+# }
+
+###
+
+### ============================================================================
+### NOTES
+### ============================================================================
+
+# Transit Operation Details:
+# 
+# Account Mapping:
+# - Debit Account (accountId=101): BILLING
+#   - Represents institution's billing/revenue account
+#   - Decreased when transferring to cash
+# 
+# - Credit Account (accountId=102): BILLING_CASH
+#   - Represents institution's cash account
+#   - Increased when receiving transfer
+#
+# Transaction Type: "TRANSIT" (vs WITHDRAWAL for external withdrawals)
+#
+# Journal Entry Structure:
+# Debit:  BILLING Account    (e.g., 2,500,000.00)
+# Credit: BILLING_CASH Account   (e.g., 2,500,000.00)
+#
+# Both accounts must exist at INSTITUTION level for the user's institution
+#
+# Invoice Generation:
+# - Auto-generated invoice number (INV-TRN-{timestamp}-{random})
+# - Status set to "PAID" immediately
+# - Linked to transaction journal for audit trail
+#
+# Balance Updates:
+# - Both available and ledger balances updated atomically
+# - Transaction is fully transactional (all-or-nothing)
+#
+# Audit Trail:
+# - User initiator ID recorded
+# - System source tracked as "CORE"
+# - All timestamps recorded
+# - Invoice number provides external reference

@@ -1,0 +1,378 @@
+### BroadcastRecipient - HTTP collection for Broadcast Recipient Management
+# Replace {{baseUrl}} with `http://localhost:8081` (or your server URL)
+# Replace {{token}} with a valid JWT token
+
+# ============================================================================
+# BROADCAST RECIPIENT - SEND NOW
+# ============================================================================
+
+### Send Broadcast Now (Single Recipient)
+# Sends broadcast immediately with optional per-recipient message personalization
+POST {{baseUrl}}/api/broadcasts/recipients/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890",
+  "recipientGroup": "class-10a",
+  "messageItem": {
+    "name": "Budi",
+    "class": "10A",
+    "tuition": "Rp 1.500.000"
+  }
+}
+
+###
+
+### Send Broadcast Now (Multiple Recipients - Bulk by IDs)
+# Sends broadcast to multiple recipients using their IDs
+# IMPORTANT: Field name MUST be "students" (not "recipients")
+POST {{baseUrl}}/api/broadcast-recipients/bulk-id/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "recipientGroup": "class-10a",
+  "students": [
+    {
+      "studentId": 12345,
+      "studentName": "Budi Santoso",
+      "whatsappNumber": "6281234567890"
+    },
+    {
+      "studentId": 12346,
+      "studentName": "Ani Wijaya",
+      "whatsappNumber": "6281234567891"
+    }
+  ]
+}
+
+###
+
+### Send Broadcast Now (Bulk Recipients - Direct)
+# Sends broadcast to multiple recipients with full recipient objects
+POST {{baseUrl}}/api/broadcasts/recipients/bulk/send-now
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 2,
+  "recipients": [
+    {
+      "studentId": 12347,
+      "studentName": "Rudi Hartono",
+      "whatsappNumber": "6281234567892",
+      "recipientGroup": "class-10b",
+      "messageItem": {
+        "name": "Rudi",
+        "class": "10B",
+        "studentId": "22001",
+        "score": "85"
+      }
+    },
+    {
+      "studentId": 12348,
+      "studentName": "Siti Nurhaliza",
+      "whatsappNumber": "6281234567893",
+      "recipientGroup": "class-10b",
+      "messageItem": {
+        "name": "Siti",
+        "class": "10B",
+        "studentId": "22002",
+        "score": "92"
+      }
+    }
+  ]
+}
+
+###
+
+# ============================================================================
+# BROADCAST RECIPIENT - SCHEDULED DELIVERY
+# ============================================================================
+
+### Schedule Broadcast (Single Recipient)
+# Schedules broadcast to be sent at specific date/time
+POST {{baseUrl}}/api/broadcasts/recipients/schedule?scheduleDate=2025-12-25T09:00:00
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890",
+  "recipientGroup": "class-10a",
+  "messageItem": {
+    "name": "Budi",
+    "occasion": "Christmas",
+    "message": "Selamat hari raya"
+  }
+}
+
+###
+
+### Schedule Broadcast (Bulk by IDs)
+# Schedules broadcast for multiple recipients by IDs
+POST {{baseUrl}}/api/broadcasts/recipients/bulk-id/schedule?scheduleDate=2025-12-25T10:00:00
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 1,
+  "recipients": [
+    {
+      "studentId": 12345,
+      "studentName": "Budi Santoso",
+      "whatsappNumber": "6281234567890",
+      "recipientGroup": "class-10a",
+      "messageItem": {
+        "name": "Budi",
+        "occasion": "Christmas"
+      }
+    },
+    {
+      "studentId": 12346,
+      "studentName": "Ani Wijaya",
+      "whatsappNumber": "6281234567891",
+      "recipientGroup": "class-10a",
+      "messageItem": {
+        "name": "Ani",
+        "occasion": "Christmas"
+      }
+    }
+  ]
+}
+
+###
+
+### Schedule Broadcast (Bulk Recipients)
+# Schedules broadcast for multiple recipients with full details
+POST {{baseUrl}}/api/broadcasts/recipients/bulk/schedule?scheduleDate=2026-01-01T08:00:00
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 3,
+  "recipients": [
+    {
+      "studentId": 12347,
+      "studentName": "Rudi Hartono",
+      "whatsappNumber": "6281234567892",
+      "recipientGroup": "class-11",
+      "messageItem": {
+        "name": "Rudi",
+        "newYear": "2026",
+        "greeting": "Selamat Tahun Baru"
+      }
+    },
+    {
+      "studentId": 12348,
+      "studentName": "Siti Nurhaliza",
+      "whatsappNumber": "6281234567893",
+      "recipientGroup": "class-11",
+      "messageItem": {
+        "name": "Siti",
+        "newYear": "2026",
+        "greeting": "Selamat Tahun Baru"
+      }
+    }
+  ]
+}
+
+###
+
+# ============================================================================
+# BROADCAST RECIPIENT - MONTHLY DELIVERY
+# ============================================================================
+
+### Monthly Broadcast (Single Recipient)
+# Schedules broadcast to be sent monthly on specific day
+POST {{baseUrl}}/api/broadcasts/recipients/monthly?dayOfMonth=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 4,
+  "studentId": 12345,
+  "studentName": "Budi Santoso",
+  "whatsappNumber": "6281234567890",
+  "recipientGroup": "billing-reminder",
+  "messageItem": {
+    "name": "Budi",
+    "month": "January",
+    "amount": "Rp 1.500.000",
+    "dueDate": "10th"
+  }
+}
+
+###
+
+### Monthly Broadcast (Bulk by IDs)
+# Schedules monthly broadcast for multiple recipients by IDs
+POST {{baseUrl}}/api/broadcasts/recipients/bulk-id/monthly?dayOfMonth=5
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 4,
+  "recipients": [
+    {
+      "studentId": 12345,
+      "studentName": "Budi Santoso",
+      "whatsappNumber": "6281234567890",
+      "recipientGroup": "billing-reminder",
+      "messageItem": {
+        "name": "Budi",
+        "month": "January",
+        "tuitionAmount": "Rp 1.500.000"
+      }
+    },
+    {
+      "studentId": 12346,
+      "studentName": "Ani Wijaya",
+      "whatsappNumber": "6281234567891",
+      "recipientGroup": "billing-reminder",
+      "messageItem": {
+        "name": "Ani",
+        "month": "January",
+        "tuitionAmount": "Rp 1.500.000"
+      }
+    },
+    {
+      "studentId": 12347,
+      "studentName": "Rudi Hartono",
+      "whatsappNumber": "6281234567892",
+      "recipientGroup": "billing-reminder",
+      "messageItem": {
+        "name": "Rudi",
+        "month": "January",
+        "tuitionAmount": "Rp 1.500.000"
+      }
+    }
+  ]
+}
+
+###
+
+### Monthly Broadcast (Bulk Recipients)
+# Schedules monthly broadcast for multiple recipients with full details
+POST {{baseUrl}}/api/broadcasts/recipients/bulk/monthly?dayOfMonth=15
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastId": 5,
+  "recipients": [
+    {
+      "studentId": 12349,
+      "studentName": "Dewi Lestari",
+      "whatsappNumber": "6281234567894",
+      "recipientGroup": "scholarship-notification",
+      "messageItem": {
+        "name": "Dewi",
+        "month": "December",
+        "scholarshipStatus": "Active",
+        "amount": "Rp 2.000.000"
+      }
+    },
+    {
+      "studentId": 12350,
+      "studentName": "Hendra Kusuma",
+      "whatsappNumber": "6281234567895",
+      "recipientGroup": "scholarship-notification",
+      "messageItem": {
+        "name": "Hendra",
+        "month": "December",
+        "scholarshipStatus": "Active",
+        "amount": "Rp 2.000.000"
+      }
+    }
+  ]
+}
+
+###
+
+# ============================================================================
+# BROADCAST CREATION (Referenced by Recipient endpoints)
+# ============================================================================
+
+### Create Broadcast with Template
+# Template: "Halo {{name}}, tuition Anda adalah {{tuition}}"
+# Will use template content with messageItem data for personalization
+POST {{baseUrl}}/api/broadcasts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "templateId": 1,
+  "broadcastTitle": "Reminder Pembayaran SPP",
+  "messageType": "template",
+  "status": "active",
+  "scheduledAt": "2025-12-21T09:00:00"
+}
+
+###
+
+### Create Broadcast with Manual Content
+# Content will be personalized per recipient using messageItem values
+POST {{baseUrl}}/api/broadcasts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "broadcastTitle": "Pengumuman Penting - Ujian Akhir",
+  "finalContent": "Halo {{name}}, ujian akhir kelas {{class}} akan dimulai pada {{date}}. Persiapkan diri dengan baik. Nilai target: {{target_score}}",
+  "messageType": "manual",
+  "status": "active"
+}
+
+###
+
+# ============================================================================
+# NOTES & PAYLOAD FIELDS EXPLANATION
+# ============================================================================
+# 
+# BroadcastRecipientRequest Fields:
+# ------------------------------------
+# - broadcastId         : ID broadcast yang akan dikirim (Required)
+# - studentId           : ID siswa penerima (Required)
+# - studentName         : Nama siswa penerima (Required)
+# - whatsappNumber      : Nomor WhatsApp siswa, format: 62XXXXXXXXXX (Required)
+# - recipientGroup      : Grup pengelompokan penerima, misal: "class-10a", "billing", dll (Optional)
+# - messageItem         : Object key-value untuk personalisasi pesan (Optional)
+#                         Contoh: {"name": "Budi", "class": "10A", "tuition": "Rp 1.500.000"}
+#
+# Delivery Methods (Endpoints):
+# -----------------------------
+# 1. /send-now               : Kirim sekarang (single/bulk)
+# 2. /schedule               : Kirim terjadwal pada tanggal/jam tertentu
+# 3. /monthly                : Kirim berulang bulanan pada hari yang ditentukan
+#
+# URL Query Parameters:
+# ----------------------
+# - scheduleDate=YYYY-MM-DDTHH:mm:ss  : Untuk /schedule endpoint
+# - dayOfMonth=<1-31>                 : Untuk /monthly endpoint
+#
+# Message Personalization:
+# ------------------------
+# Template/content dapat berisi placeholder: {{key_name}}
+# Nilai akan diganti dari object messageItem
+# Contoh: "Halo {{name}}" dengan messageItem: {"name": "Budi"} → "Halo Budi"
+#
+# Key Features:
+# - Per-recipient message personalization via messageItem
+# - Message text stored in BroadcastRecipient.message (TEXT column)
+# - Supports single & bulk recipient delivery
+# - Scheduled and recurring delivery options
+# - Group-based recipient management
+#
+# Server Requirements:
+# - Running on {{baseUrl}} (default: http://localhost:8081)
+# - Valid JWT token in Authorization header
+# - Broadcast must exist with proper content/template
+# - WhatsApp integration configured for actual message delivery

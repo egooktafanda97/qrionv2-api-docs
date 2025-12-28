@@ -1,0 +1,16 @@
+@host = http://localhost:8081
+@contentType = application/json
+@token = {{token}}
+
+### Create transaction (purchase plan + addons)
+POST {{host}}/api/transaction-business
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "planId": 101,
+  "paymentMethodId": 301,
+  "addons": [201, 202]
+}
+
+### Note: Response contains transaction id and created addon ids
